@@ -111,6 +111,7 @@
     <div class="lib-title-rail">
       <span class="lib-title">CodeLens Library</span>
     </div>
+    <p class="lib-subtitle">Every project has its own story.</p>
 
     {{-- 本 + 棚板 --}}
     <div class="lib-shelf-wrap">
@@ -358,9 +359,14 @@
 }
 .lib-title {
   padding: 0 16px;
-  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.25em;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.35em;
   color: rgba(255,255,255,0.38);
   text-transform: uppercase; white-space: nowrap;
+}
+.lib-subtitle {
+  font-size: 0.60rem; color: rgba(255,255,255,0.18);
+  letter-spacing: 0.06em; text-align: center;
+  margin: 6px 0 14px; font-style: italic;
 }
 
 /* Shelf wrap */
@@ -412,7 +418,7 @@
 /* Book image */
 .lib-book-img {
   width: 100%; display: block; border-radius: 6px;
-  transition: transform 0.25s ease, filter 0.25s ease;
+  transition: transform 0.22s ease, filter 0.22s ease;
   will-change: transform, filter;
   transform-origin: center bottom;
 }
@@ -439,7 +445,7 @@
 }
 .lib-book--archive:hover .lib-book-img {
   transform: translateY(-5px) scale(1.01);
-  transition: transform 0.55s ease, filter 0.55s ease;
+  transition: transform 0.35s ease, filter 0.35s ease;
   filter: saturate(0.38) brightness(0.75); /* 金縁グローなし */
 }
 
