@@ -116,57 +116,33 @@
 
     <div class="library-shelf">
 
-      <a class="lib-book" href="#" target="_blank" rel="noopener" data-label="Open →">
-        <div class="lib-book-wrap">
-          <img src="/images/library/book-codelens.png" alt="CodeLens" class="lib-book-img">
-          <div class="lib-book-open">Open →</div>
-          <div class="lib-book-shadow"></div>
-        </div>
+      <a class="lib-book" href="#" target="_blank" rel="noopener">
+        <img src="/images/library/book-codelens.png" alt="CodeLens" class="lib-book-img">
         <span class="lib-book-name">CodeLens</span>
       </a>
 
       <a class="lib-book" href="#" target="_blank" rel="noopener">
-        <div class="lib-book-wrap">
-          <img src="/images/library/book-design-bible.png" alt="Design Bible" class="lib-book-img">
-          <div class="lib-book-open">Open →</div>
-          <div class="lib-book-shadow"></div>
-        </div>
+        <img src="/images/library/book-design-bible.png" alt="Design Bible" class="lib-book-img">
         <span class="lib-book-name">Design Bible</span>
       </a>
 
       <a class="lib-book" href="#" target="_blank" rel="noopener">
-        <div class="lib-book-wrap">
-          <img src="/images/library/book-knowledge.png" alt="Knowledge" class="lib-book-img">
-          <div class="lib-book-open">Open →</div>
-          <div class="lib-book-shadow"></div>
-        </div>
+        <img src="/images/library/book-knowledge.png" alt="Knowledge" class="lib-book-img">
         <span class="lib-book-name">Knowledge</span>
       </a>
 
       <a class="lib-book" href="#" target="_blank" rel="noopener">
-        <div class="lib-book-wrap">
-          <img src="/images/library/book-projects.png" alt="Projects" class="lib-book-img">
-          <div class="lib-book-open">Open →</div>
-          <div class="lib-book-shadow"></div>
-        </div>
+        <img src="/images/library/book-projects.png" alt="Projects" class="lib-book-img">
         <span class="lib-book-name">Projects</span>
       </a>
 
       <a class="lib-book" href="#" target="_blank" rel="noopener">
-        <div class="lib-book-wrap">
-          <img src="/images/library/book-ideas.png" alt="Ideas" class="lib-book-img">
-          <div class="lib-book-open">Open →</div>
-          <div class="lib-book-shadow"></div>
-        </div>
+        <img src="/images/library/book-ideas.png" alt="Ideas" class="lib-book-img">
         <span class="lib-book-name">Ideas</span>
       </a>
 
       <a class="lib-book lib-book--archive" href="#" target="_blank" rel="noopener">
-        <div class="lib-book-wrap">
-          <img src="/images/library/book-archive.png" alt="Archive" class="lib-book-img">
-          <div class="lib-book-open">Open →</div>
-          <div class="lib-book-shadow"></div>
-        </div>
+        <img src="/images/library/book-archive.png" alt="Archive" class="lib-book-img">
         <span class="lib-book-name">Archive</span>
       </a>
 
@@ -353,109 +329,73 @@
 
 /* ===== CodeLens Library ===== */
 .library-section {
-  margin-bottom: 40px;
+  /* 左右に少しはみ出してコンテナより広く使う → 本が大きく見える */
+  margin: 0 -12px 44px;
+  padding: 0 12px;
 }
 .library-header {
   display: flex; align-items: center; gap: 12px;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
 }
 .lib-title-icon { font-size: 1.4rem; line-height: 1; }
 .lib-title {
   font-size: 0.72rem; font-weight: 800; letter-spacing: 0.2em;
-  color: #fff; margin-bottom: 3px;
-  text-transform: uppercase;
+  color: #fff; margin-bottom: 3px; text-transform: uppercase;
 }
-.lib-subtitle {
-  font-size: 0.62rem; color: var(--text-mute); letter-spacing: 0.08em;
-}
+.lib-subtitle { font-size: 0.62rem; color: var(--text-mute); letter-spacing: 0.08em; }
 
-/* Shelf row */
+/* Shelf — gap 6px でシリーズ感 */
 .library-shelf {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 14px;
+  gap: 6px;
   align-items: end;
 }
 
 /* Each book */
 .lib-book {
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
   text-decoration: none;
-  cursor: pointer;
 }
-.lib-book-wrap {
-  position: relative;
-  width: 100%;
-  perspective: 600px;
-}
+
+/* Book image */
 .lib-book-img {
-  width: 100%; display: block;
-  border-radius: 6px;
-  transform: translateY(0) rotateY(0deg) scale(1);
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-              filter 0.35s ease,
-              box-shadow 0.35s ease;
+  width: 100%; display: block; border-radius: 6px;
+  transition: transform 0.25s ease, filter 0.25s ease;
   will-change: transform, filter;
   transform-origin: center bottom;
 }
-/* Shadow blob beneath each book */
-.lib-book-shadow {
-  position: absolute;
-  bottom: -10px; left: 10%; right: 10%;
-  height: 18px;
-  background: rgba(0,0,0,0.55);
-  filter: blur(10px);
-  border-radius: 50%;
-  transition: transform 0.35s ease, opacity 0.35s ease;
-  transform: scaleX(1);
-  opacity: 0.7;
-}
-/* "Open →" overlay */
-.lib-book-open {
-  position: absolute;
-  bottom: 14%; left: 0; right: 0;
-  text-align: center;
-  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em;
-  color: #fff;
-  text-shadow: 0 0 8px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8);
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  pointer-events: none;
-}
 
-/* Hover state */
+/* Hover — シンプルに浮かせる + 金縁グロー */
 .lib-book:hover .lib-book-img {
-  transform: translateY(-14px) rotateY(-6deg) scale(1.04);
-  filter: drop-shadow(0 18px 28px rgba(0,0,0,0.55));
-}
-.lib-book:hover .lib-book-shadow {
-  transform: scaleX(0.75) translateY(4px);
-  opacity: 0.4;
-}
-.lib-book:hover .lib-book-open {
-  opacity: 1;
-  transform: translateY(0);
+  transform: translateY(-8px) scale(1.03);
+  filter:
+    drop-shadow(0 20px 40px rgba(0,0,0,0.55))
+    drop-shadow(0 0 10px rgba(185,148,52,0.28)); /* 金縁を微発光 */
 }
 
-/* Book name label */
+/* Book label */
 .lib-book-name {
-  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.06em;
-  color: var(--text-mute);
-  transition: color 0.2s ease;
-  text-align: center;
+  font-size: 0.58rem; font-weight: 600; letter-spacing: 0.06em;
+  color: var(--text-mute); text-align: center;
+  transition: color 0.2s;
 }
 .lib-book:hover .lib-book-name { color: var(--text-dim); }
 
-/* Archive — slightly muted to signal "sealed" */
-.lib-book--archive .lib-book-img { filter: saturate(0.7) brightness(0.85); }
+/* Archive — 静かに眠っている */
+.lib-book--archive .lib-book-img {
+  filter: saturate(0.25) brightness(0.65);
+}
 .lib-book--archive:hover .lib-book-img {
-  filter: saturate(0.85) brightness(0.95) drop-shadow(0 18px 28px rgba(0,0,0,0.65));
+  transform: translateY(-5px) scale(1.01);
+  transition: transform 0.55s ease, filter 0.55s ease; /* ゆっくり */
+  filter: saturate(0.40) brightness(0.78); /* 金縁グローなし */
 }
 
 /* Responsive */
 @media (max-width: 640px) {
-  .library-shelf { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .library-shelf { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .library-section { margin: 0 0 44px; padding: 0; }
 }
 @media (max-width: 380px) {
   .library-shelf { grid-template-columns: repeat(2, 1fr); }
