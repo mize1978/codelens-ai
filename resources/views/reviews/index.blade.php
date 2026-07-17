@@ -106,43 +106,52 @@
 
   {{-- CodeLens Library --}}
   <div class="library-section">
-    <div class="library-header">
-      <p class="lib-title">CodeLens Library</p>
+
+    {{-- タイトルレール: ─── CodeLens Library ─── --}}
+    <div class="lib-title-rail">
+      <span class="lib-title">CodeLens Library</span>
     </div>
 
-    <div class="library-shelf">
+    {{-- 本 + 棚板 --}}
+    <div class="lib-shelf-wrap">
+      <div class="library-shelf">
 
-      <a class="lib-book" href="#" target="_blank" rel="noopener">
-        <img src="/images/library/book-codelens.png" alt="CodeLens" class="lib-book-img">
-        <span class="lib-book-name">CodeLens</span>
-      </a>
+        <a class="lib-book" href="#" target="_blank" rel="noopener">
+          <img src="/images/library/book-codelens.png" alt="CodeLens" class="lib-book-img">
+          <span class="lib-book-name">CodeLens</span>
+        </a>
 
-      <a class="lib-book" href="#" target="_blank" rel="noopener">
-        <img src="/images/library/book-design-bible.png" alt="Design Bible" class="lib-book-img">
-        <span class="lib-book-name">Design Bible</span>
-      </a>
+        <a class="lib-book" href="#" target="_blank" rel="noopener">
+          <img src="/images/library/book-design-bible.png" alt="Design Bible" class="lib-book-img">
+          <span class="lib-book-name">Design Bible</span>
+        </a>
 
-      <a class="lib-book" href="#" target="_blank" rel="noopener">
-        <img src="/images/library/book-knowledge.png" alt="Knowledge" class="lib-book-img">
-        <span class="lib-book-name">Knowledge</span>
-      </a>
+        <a class="lib-book" href="#" target="_blank" rel="noopener">
+          <img src="/images/library/book-knowledge.png" alt="Knowledge" class="lib-book-img">
+          <span class="lib-book-name">Knowledge</span>
+        </a>
 
-      <a class="lib-book" href="#" target="_blank" rel="noopener">
-        <img src="/images/library/book-projects.png" alt="Projects" class="lib-book-img">
-        <span class="lib-book-name">Projects</span>
-      </a>
+        <a class="lib-book" href="#" target="_blank" rel="noopener">
+          <img src="/images/library/book-projects.png" alt="Projects" class="lib-book-img">
+          <span class="lib-book-name">Projects</span>
+        </a>
 
-      <a class="lib-book" href="#" target="_blank" rel="noopener">
-        <img src="/images/library/book-ideas.png" alt="Ideas" class="lib-book-img">
-        <span class="lib-book-name">Ideas</span>
-      </a>
+        <a class="lib-book" href="#" target="_blank" rel="noopener">
+          <img src="/images/library/book-ideas.png" alt="Ideas" class="lib-book-img">
+          <span class="lib-book-name">Ideas</span>
+        </a>
 
-      <a class="lib-book lib-book--archive" href="#" target="_blank" rel="noopener">
-        <img src="/images/library/book-archive.png" alt="Archive" class="lib-book-img">
-        <span class="lib-book-name">Archive</span>
-      </a>
+        <a class="lib-book lib-book--archive" href="#" target="_blank" rel="noopener">
+          <img src="/images/library/book-archive.png" alt="Archive" class="lib-book-img">
+          <span class="lib-book-name">Archive</span>
+        </a>
 
+      </div>
+
+      {{-- 棚板: ◎────────────────◎ --}}
+      <div class="lib-shelf-board"></div>
     </div>
+
   </div>
 
   {{-- Popular Reviews --}}
@@ -325,28 +334,74 @@
 
 /* ===== CodeLens Library ===== */
 .library-section {
-  /* 左右に少しはみ出してコンテナより広く使う → 本が大きく見える */
-  margin: 0 -12px 44px;
+  margin: 0 -12px 48px;
   padding: 0 12px;
 }
-.library-header {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 22px;
-}
-.lib-title-icon { font-size: 1.4rem; line-height: 1; }
-.lib-title {
-  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.2em;
-  color: #fff; margin-bottom: 3px; text-transform: uppercase;
-}
-.lib-subtitle { font-size: 0.62rem; color: var(--text-mute); letter-spacing: 0.08em; }
 
-/* Shelf — gap 6px でシリーズ感 */
+/* ─── CodeLens Library ─── */
+.lib-title-rail {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.lib-title-rail::before,
+.lib-title-rail::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+}
+.lib-title-rail::before {
+  background: linear-gradient(90deg, transparent, rgba(0,200,255,0.22));
+}
+.lib-title-rail::after {
+  background: linear-gradient(270deg, transparent, rgba(0,200,255,0.22));
+}
+.lib-title {
+  padding: 0 16px;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.38);
+  text-transform: uppercase; white-space: nowrap;
+}
+
+/* Shelf wrap */
+.lib-shelf-wrap { position: relative; }
+
+/* Books grid */
 .library-shelf {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 6px;
   align-items: end;
+  padding-bottom: 6px;
 }
+
+/* ◎──────────────◎ 棚板 */
+.lib-shelf-board {
+  position: relative;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0,185,255,0.18) 5%,
+    rgba(0,205,255,0.58) 50%,
+    rgba(0,185,255,0.18) 95%,
+    transparent 100%
+  );
+  box-shadow: 0 0 14px rgba(0,200,255,0.16), 0 1px 1px rgba(0,200,255,0.10);
+}
+/* ◎ 端のキャップ */
+.lib-shelf-board::before,
+.lib-shelf-board::after {
+  content: '';
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(0,215,255,0.95);
+  box-shadow: 0 0 8px rgba(0,200,255,0.85), 0 0 20px rgba(0,200,255,0.40);
+}
+.lib-shelf-board::before { left: 0; }
+.lib-shelf-board::after  { right: 0; }
 
 /* Each book */
 .lib-book {
@@ -362,12 +417,12 @@
   transform-origin: center bottom;
 }
 
-/* Hover — シンプルに浮かせる + 金縁グロー */
+/* ホバー: 浮く + 棚板に影が落ちる + 金縁グロー */
 .lib-book:hover .lib-book-img {
   transform: translateY(-8px) scale(1.03);
   filter:
-    drop-shadow(0 20px 40px rgba(0,0,0,0.55))
-    drop-shadow(0 0 10px rgba(185,148,52,0.28)); /* 金縁を微発光 */
+    drop-shadow(0 22px 8px rgba(0,0,0,0.52))    /* 棚板への影 */
+    drop-shadow(0 0 10px rgba(185,148,52,0.28)); /* 金縁グロー */
 }
 
 /* Book label */
@@ -380,12 +435,12 @@
 
 /* Archive — 静かに眠っている */
 .lib-book--archive .lib-book-img {
-  filter: saturate(0.25) brightness(0.65);
+  filter: saturate(0.25) brightness(0.62);
 }
 .lib-book--archive:hover .lib-book-img {
   transform: translateY(-5px) scale(1.01);
-  transition: transform 0.55s ease, filter 0.55s ease; /* ゆっくり */
-  filter: saturate(0.40) brightness(0.78); /* 金縁グローなし */
+  transition: transform 0.55s ease, filter 0.55s ease;
+  filter: saturate(0.38) brightness(0.75); /* 金縁グローなし */
 }
 
 /* Responsive */
