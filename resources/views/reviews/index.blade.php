@@ -119,32 +119,50 @@
 
         <a class="lib-book" href="#" target="_blank" rel="noopener">
           <img src="/images/library/book-codelens.png" alt="CodeLens" class="lib-book-img">
-          <span class="lib-book-name">CodeLens</span>
+          <div class="lib-book-label">
+            <span class="lib-book-name">CodeLens</span>
+            <span class="lib-book-open">Open →</span>
+          </div>
         </a>
 
         <a class="lib-book" href="#" target="_blank" rel="noopener">
           <img src="/images/library/book-design-bible.png" alt="Design Bible" class="lib-book-img">
-          <span class="lib-book-name">Design Bible</span>
+          <div class="lib-book-label">
+            <span class="lib-book-name">Design Bible</span>
+            <span class="lib-book-open">Open →</span>
+          </div>
         </a>
 
         <a class="lib-book" href="#" target="_blank" rel="noopener">
           <img src="/images/library/book-knowledge.png" alt="Knowledge" class="lib-book-img">
-          <span class="lib-book-name">Knowledge</span>
+          <div class="lib-book-label">
+            <span class="lib-book-name">Knowledge</span>
+            <span class="lib-book-open">Open →</span>
+          </div>
         </a>
 
         <a class="lib-book" href="#" target="_blank" rel="noopener">
           <img src="/images/library/book-projects.png" alt="Projects" class="lib-book-img">
-          <span class="lib-book-name">Projects</span>
+          <div class="lib-book-label">
+            <span class="lib-book-name">Projects</span>
+            <span class="lib-book-open">Open →</span>
+          </div>
         </a>
 
         <a class="lib-book" href="#" target="_blank" rel="noopener">
           <img src="/images/library/book-ideas.png" alt="Ideas" class="lib-book-img">
-          <span class="lib-book-name">Ideas</span>
+          <div class="lib-book-label">
+            <span class="lib-book-name">Ideas</span>
+            <span class="lib-book-open">Open →</span>
+          </div>
         </a>
 
         <a class="lib-book lib-book--archive" href="#" target="_blank" rel="noopener">
           <img src="/images/library/book-archive.png" alt="Archive" class="lib-book-img">
-          <span class="lib-book-name">Archive</span>
+          <div class="lib-book-label">
+            <span class="lib-book-name">Archive</span>
+            <span class="lib-book-open">Open →</span>
+          </div>
         </a>
 
       </div>
@@ -423,21 +441,35 @@
   transform-origin: center bottom;
 }
 
-/* ホバー: 浮く + 棚板に影が落ちる + 金縁グロー */
+/* ホバー: 6px 浮く + 棚板に影 + 金縁グロー */
 .lib-book:hover .lib-book-img {
-  transform: translateY(-8px) scale(1.03);
+  transform: translateY(-6px) scale(1.03);
   filter:
-    drop-shadow(0 22px 8px rgba(0,0,0,0.52))    /* 棚板への影 */
+    drop-shadow(0 18px 8px rgba(0,0,0,0.50))    /* 棚板への影 */
     drop-shadow(0 0 10px rgba(185,148,52,0.28)); /* 金縁グロー */
 }
 
-/* Book label */
-.lib-book-name {
-  font-size: 0.58rem; font-weight: 600; letter-spacing: 0.06em;
-  color: var(--text-mute); text-align: center;
-  transition: color 0.2s;
+/* ホバー時のみ現れるラベル */
+.lib-book-label {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-height: 30px; /* レイアウトシフト防止 */
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
 }
-.lib-book:hover .lib-book-name { color: var(--text-dim); }
+.lib-book:hover .lib-book-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+.lib-book-name {
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.65); text-align: center;
+}
+.lib-book-open {
+  font-size: 0.50rem; letter-spacing: 0.14em;
+  color: rgba(0,200,255,0.60);
+}
 
 /* Archive — 静かに眠っている */
 .lib-book--archive .lib-book-img {
