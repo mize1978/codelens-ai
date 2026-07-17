@@ -117,6 +117,7 @@
             if (json.status === 'complete' || json.status === 'failed') {
                 clearInterval(pctInterval);
                 document.querySelectorAll('.logo-icon').forEach(el => el.classList.remove('spinning'));
+                if (window.CodeLensStatus) window.CodeLensStatus.set('complete');
 
                 // 95% → 100% の一瞬演出
                 bar.style.width = '95%';
@@ -157,6 +158,7 @@
         }
     }
 
+    if (window.CodeLensStatus) window.CodeLensStatus.set('reviewing');
     setTimeout(poll, 2000);
 })();
 </script>

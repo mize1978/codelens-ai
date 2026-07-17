@@ -86,20 +86,51 @@
     .nav { display: flex; gap: 20px; align-items: center; }
     .nav a { font-size: 0.73rem; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
     .nav a:hover { color: var(--cyan); }
+    /* Status pill */
     .status-pill {
       display: flex; align-items: center; gap: 6px;
       font-size: 0.68rem; color: var(--text-dim);
       border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px;
+      cursor: default; position: relative; transition: border-color 0.3s, color 0.3s;
+      user-select: none;
     }
-    @keyframes pulse-dot {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,136,0.6); }
-      50%       { box-shadow: 0 0 0 4px rgba(0,255,136,0); }
+    .status-pill[data-state="active"]    { border-color: rgba(0,255,136,0.35); color: var(--green); }
+    .status-pill[data-state="reviewing"] { border-color: rgba(68,136,255,0.5);  color: var(--blue); }
+    .status-pill[data-state="thinking"]  { border-color: rgba(153,68,255,0.5);  color: var(--purple); }
+    .status-pill[data-state="complete"]  { border-color: rgba(255,204,0,0.5);   color: var(--yellow); }
+
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+      transition: background 0.3s, box-shadow 0.3s;
     }
-    .dot-online {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green);
-      animation: pulse-dot 2.4s ease-in-out infinite;
+    .status-pill[data-state="active"]    .status-dot { background: var(--green);  box-shadow: 0 0 0 0 rgba(0,255,136,0.6);  animation: pulse-active 2.4s ease-in-out infinite; }
+    .status-pill[data-state="reviewing"] .status-dot { background: var(--blue);   animation: pulse-reviewing 0.9s ease-in-out infinite; }
+    .status-pill[data-state="thinking"]  .status-dot { background: var(--purple); animation: pulse-thinking 0.6s ease-in-out infinite; }
+    .status-pill[data-state="complete"]  .status-dot { background: var(--yellow); animation: none; box-shadow: 0 0 8px rgba(255,204,0,0.8); }
+
+    @keyframes pulse-active    { 0%,100%{box-shadow:0 0 0 0 rgba(0,255,136,0.6)}  50%{box-shadow:0 0 0 4px rgba(0,255,136,0)} }
+    @keyframes pulse-reviewing { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    @keyframes pulse-thinking  { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:0.5; transform:scale(1.5)} }
+
+    /* HUD tooltip */
+    .status-hud {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      background: rgba(4,4,20,0.96); border: 1px solid var(--border-hi);
+      border-radius: 8px; padding: 12px 14px; min-width: 180px;
+      backdrop-filter: blur(12px); z-index: 999;
+      font-size: 0.65rem; letter-spacing: 0.06em;
+      box-shadow: 0 8px 32px rgba(0,200,255,0.1);
     }
+    .status-pill:hover .status-hud { display: block; }
+    .hud-title {
+      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: 8px; font-weight: 700;
+    }
+    .hud-row {
+      display: flex; justify-content: space-between; gap: 16px;
+      color: var(--text-dim); margin-bottom: 4px;
+    }
+    .hud-row span:last-child { color: var(--text); font-weight: 700; }
 
     /* Panel */
     .panel {
@@ -278,9 +309,16 @@
     <nav class="nav">
       <a href="{{ route('ranking') }}">ランキング</a>
     </nav>
-    <div class="status-pill">
-      <span class="dot-online"></span>
-      AI ONLINE
+    <div class="status-pill" id="cl-status" data-state="active">
+      <span class="status-dot"></span>
+      <span class="status-label">CodeLens ACTIVE</span>
+      <div class="status-hud">
+        <div class="hud-title">CodeLens Engine</div>
+        <div class="hud-row"><span>Status</span><span id="hud-status">Online</span></div>
+        <div class="hud-row"><span>Version</span><span>v0.4</span></div>
+        <div class="hud-row"><span>Model</span><span>Claude</span></div>
+        <div class="hud-row"><span>Latency</span><span id="hud-latency">—</span></div>
+      </div>
     </div>
   </header>
 
@@ -288,6 +326,46 @@
     @yield('content')
   </main>
 <script>
+// CodeLens Status Controller
+window.CodeLensStatus = (function () {
+  const pill    = document.getElementById('cl-status');
+  const label   = pill.querySelector('.status-label');
+  const hudStat = document.getElementById('hud-status');
+  const hudLat  = document.getElementById('hud-latency');
+  let _startTime = null;
+  let _completeTimer = null;
+
+  const STATES = {
+    active:    { label: '🟢 CodeLens ACTIVE',  hud: 'Online',     state: 'active' },
+    reviewing: { label: '🔵 Reviewing...',      hud: 'Reviewing',  state: 'reviewing' },
+    thinking:  { label: '🟣 Thinking...',       hud: 'Thinking',   state: 'thinking' },
+    complete:  { label: '✨ Review Complete',   hud: 'Complete',   state: 'complete' },
+  };
+
+  function set(key) {
+    if (_completeTimer) { clearTimeout(_completeTimer); _completeTimer = null; }
+    const s = STATES[key] || STATES.active;
+    pill.dataset.state = s.state;
+    label.textContent  = s.label;
+    if (hudStat) hudStat.textContent = s.hud;
+
+    if (key === 'reviewing') {
+      _startTime = Date.now();
+      hudLat && (hudLat.textContent = '—');
+    }
+    if (key === 'complete') {
+      if (_startTime) {
+        const ms = ((Date.now() - _startTime) / 1000).toFixed(2);
+        hudLat && (hudLat.textContent = ms + 's');
+        _startTime = null;
+      }
+      _completeTimer = setTimeout(() => set('active'), 800);
+    }
+  }
+
+  return { set };
+})();
+
 // レーダースイープ — 6秒ごとに1回
 (function radarLoop() {
   const wrap = document.querySelector('.logo-icon-wrap');

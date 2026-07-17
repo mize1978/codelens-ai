@@ -295,12 +295,16 @@ document.getElementById('review-form').addEventListener('submit', function(e) {
   // 入力欄にスキャンビームを走らせる
   inputWrap.classList.add('scanning');
 
+  // ステータス更新
+  if (window.CodeLensStatus) window.CodeLensStatus.set('reviewing');
+
   // ボタンシーケンス: ○ → ◎ → AI Analyzing...
   btn.textContent = '○';
   setTimeout(() => { btn.textContent = '◎'; }, 220);
   setTimeout(() => {
     btn.textContent = 'AI Analyzing...';
     btn.classList.add('btn-reviewing');
+    if (window.CodeLensStatus) window.CodeLensStatus.set('thinking');
   }, 520);
 
   // ロゴスピン
