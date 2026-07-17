@@ -1,214 +1,448 @@
 @extends('layouts.app')
-@section('title', $review->owner.'/'.$review->repo.' — CodeLens AI')
-
-@section('head')
-<meta name="review-id" content="{{ $review->id }}">
-<meta name="review-status" content="{{ $review->status }}">
-@endsection
+@section('title', $review->owner.'/'.$review->repo.' — DevInsight AI')
 
 @section('content')
-<div style="max-width:1100px;margin:0 auto;padding:20px" id="review-wrap">
+<div class="show-page">
 
-  <!-- Breadcrumb -->
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:0.72rem;color:var(--text-mute)">
-    <a href="{{ route('reviews.index') }}" style="color:var(--cyan)">CodeLens AI</a>
-    <span>/</span>
-    <a href="{{ $review->github_url }}" target="_blank" style="color:var(--text-dim)">{{ $review->owner }}/{{ $review->repo }}</a>
-  </div>
-
-  @if($review->status !== 'complete')
-  <!-- Processing state -->
-  <div id="processing-view" class="panel" style="padding:40px;text-align:center">
-    <div id="process-icon" style="font-size:2.5rem;margin-bottom:16px">⚙️</div>
-    <h2 style="font-size:1.1rem;margin-bottom:8px" id="process-title">AIレビューを実行中...</h2>
-    <p id="process-step" style="font-size:0.78rem;color:var(--text-dim);margin-bottom:24px">リポジトリを解析しています...</p>
-
-    <div style="max-width:400px;margin:0 auto">
-      @foreach(['GitHubからファイルツリーを取得中...', '重要ファイルを選択中...', 'AIがコードを解析中...', 'レビュー結果を生成中...'] as $step)
-      <div class="console-line" style="text-align:left;font-size:0.75rem;color:var(--text-dim);margin-bottom:4px;opacity:0;transition:opacity 0.3s">
-        <span style="color:var(--cyan);margin-right:8px">&gt;</span> {{ $step }}
-      </div>
-      @endforeach
-    </div>
-
-    <div style="margin-top:24px;height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;max-width:400px;margin-left:auto;margin-right:auto">
-      <div id="progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:2px;transition:width 0.5s ease"></div>
-    </div>
-  </div>
-  @endif
-
-  <!-- Result state (hidden until complete) -->
-  <div id="result-view" class="{{ $review->status !== 'complete' ? 'hidden' : '' }}">
-    @if($review->status === 'complete' && $review->review_data)
-    @php $data = $review->review_data; @endphp
-
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-      <div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-          <h1 style="font-size:1.3rem;font-weight:900">{{ $review->owner }}/{{ $review->repo }}</h1>
-          <span class="badge badge-{{ $review->score_color }}">{{ $review->score_label }}</span>
-          @if($data['language'] ?? null)
-          <span class="badge badge-blue">{{ $data['language'] }}</span>
-          @endif
-          @if($data['framework'] ?? null)
-          <span class="badge badge-blue">{{ $data['framework'] }}</span>
-          @endif
+{{-- ===== PROCESSING STATE ===== --}}
+@if($review->status !== 'complete' && $review->status !== 'failed')
+<div id="processing-view">
+    <div class="processing-card">
+        <div class="processing-header">
+            <div class="proc-icon">⚡</div>
+            <h2>AI解析中...</h2>
+            <p class="proc-repo">{{ $review->owner }}/{{ $review->repo }}</p>
         </div>
-        <p style="font-size:0.78rem;color:var(--text-dim)">{{ $data['summary'] ?? '' }}</p>
-      </div>
-      <a href="{{ $review->github_url }}" target="_blank" class="btn btn-primary" style="font-size:0.75rem;padding:8px 16px">
-        GitHub で見る →
-      </a>
-    </div>
-
-    <!-- 3-col layout -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
-
-      <!-- Score: Quality -->
-      @foreach([
-        ['品質スコア', $review->quality_score, 'quality'],
-        ['セキュリティ', $review->security_score, 'security'],
-        ['保守性', $review->maintainability_score, 'maintain'],
-      ] as [$label, $score, $key])
-      @php
-        $clr = $score >= 80 ? 'green' : ($score >= 60 ? 'blue' : ($score >= 40 ? 'yellow' : 'red'));
-        $offset = 283 * (1 - $score / 100);
-      @endphp
-      <div class="panel" style="padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px">
-        <p class="section-title" style="margin:0">{{ $label }}</p>
-        <div class="score-ring-wrap">
-          <svg viewBox="0 0 100 100" class="score-ring">
-            <circle class="ring-bg" cx="50" cy="50" r="45"/>
-            <circle class="ring-fill {{ $clr }}" cx="50" cy="50" r="45"
-              style="stroke-dashoffset: {{ $offset }}"/>
-          </svg>
-          <div class="ring-center">
-            <span class="ring-pct">{{ $score }}</span>
-            <span class="ring-label" style="color:var(--{{ $clr === 'blue' ? 'blue' : $clr }})">
-              {{ $score >= 80 ? 'GREAT' : ($score >= 60 ? 'GOOD' : ($score >= 40 ? 'FAIR' : 'POOR')) }}
-            </span>
-          </div>
+        <div class="console-box" id="console-box">
+            <div class="console-line">[INIT] DevInsight AI v2.0 起動中...</div>
         </div>
-      </div>
-      @endforeach
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-
-      <!-- Strengths -->
-      <div class="panel" style="padding:16px">
-        <p class="section-title">✅ 良い点</p>
-        @foreach($data['strengths'] ?? [] as $s)
-        <div class="check-item"><span class="check">✓</span><span>{{ $s }}</span></div>
-        @endforeach
-      </div>
-
-      <!-- Refactor suggestions -->
-      <div class="panel" style="padding:16px">
-        <p class="section-title">🔧 リファクタ提案</p>
-        @foreach($data['refactor_suggestions'] ?? [] as $r)
-        <div class="check-item"><span style="color:var(--cyan)">→</span><span>{{ $r }}</span></div>
-        @endforeach
-      </div>
-    </div>
-
-    <!-- Issues -->
-    @if(count($data['issues'] ?? []))
-    <div class="panel" style="padding:16px;margin-bottom:16px">
-      <p class="section-title">⚠️ 検出された問題</p>
-      @foreach($data['issues'] as $issue)
-      <div class="issue-card {{ $issue['severity'] }}">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <div class="issue-title">{{ $issue['title'] }}</div>
-          <span class="badge badge-{{ $issue['severity'] === 'high' ? 'red' : ($issue['severity'] === 'medium' ? 'yellow' : 'blue') }}">
-            {{ strtoupper($issue['severity']) }}
-          </span>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar" id="progress-bar" style="width:0%"></div>
         </div>
-        <div class="issue-desc">{{ $issue['description'] }}</div>
-      </div>
-      @endforeach
+        <p class="progress-label" id="progress-label">0%</p>
     </div>
-    @endif
-
-    <!-- Security + Verdict -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="panel" style="padding:16px">
-        <p class="section-title">🔒 セキュリティ</p>
-        @foreach($data['security_notes'] ?? [] as $note)
-        <div class="check-item"><span class="warn">⚠</span><span>{{ $note }}</span></div>
-        @endforeach
-      </div>
-      <div class="panel" style="padding:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
-        <p class="section-title">🎯 総評</p>
-        <p style="font-size:0.85rem;line-height:1.6;color:var(--text-dim)">
-          "{{ $data['one_line_verdict'] ?? '' }}"
-        </p>
-        <div style="margin-top:16px">
-          <a href="https://twitter.com/intent/tweet?text={{ urlencode($review->owner.'/'.$review->repo.' のコードレビュー完了！品質スコア: '.$review->quality_score.'/100 #CodeLensAI') }}&url={{ urlencode(request()->url()) }}"
-            target="_blank" class="btn btn-primary" style="font-size:0.72rem;padding:8px 14px">
-            𝕏 シェアする
-          </a>
-        </div>
-      </div>
-    </div>
-    @endif
-  </div>
-
 </div>
 
 <script>
 (function() {
-  const status = document.querySelector('meta[name="review-status"]').content;
-  if (status === 'complete') return;
+    const url = "{{ route('reviews.process', $review) }}";
+    const token = "{{ csrf_token() }}";
+    const consoleBox = document.getElementById('console-box');
+    const bar = document.getElementById('progress-bar');
+    const label = document.getElementById('progress-label');
 
-  const reviewId = document.querySelector('meta[name="review-id"]').content;
-  const lines = document.querySelectorAll('.console-line');
-  const progressBar = document.getElementById('progress-bar');
-  let lineIdx = 0;
+    const steps = [
+        [800,  '[GITHUB] リポジトリ情報を取得中...'],
+        [1600, '[GITHUB] ファイルツリーをスキャン中...'],
+        [2400, '[READ]   ソースファイルを読み込み中...'],
+        [3200, '[CLAUDE] AIエンジンに解析依頼中...'],
+        [5000, '[CLAUDE] コード品質を評価中...'],
+        [7000, '[CLAUDE] セキュリティリスクをチェック中...'],
+        [9000, '[CLAUDE] レポートを生成中...'],
+    ];
 
-  // Animate console lines
-  function showNextLine() {
-    if (lineIdx < lines.length) {
-      lines[lineIdx].style.opacity = '1';
-      lineIdx++;
+    steps.forEach(([delay, msg]) => {
+        setTimeout(() => {
+            const line = document.createElement('div');
+            line.className = 'console-line';
+            line.textContent = msg;
+            consoleBox.appendChild(line);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }, delay);
+    });
+
+    let pct = 0;
+    const pctInterval = setInterval(() => {
+        pct = Math.min(pct + 1, 92);
+        bar.style.width = pct + '%';
+        label.textContent = pct + '%';
+    }, 200);
+
+    async function poll() {
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json' }
+            });
+            const json = await res.json();
+            if (json.status === 'complete' || json.status === 'failed') {
+                clearInterval(pctInterval);
+                bar.style.width = '100%';
+                label.textContent = '100%';
+                setTimeout(() => location.reload(), 400);
+            } else {
+                setTimeout(poll, 3000);
+            }
+        } catch(e) {
+            setTimeout(poll, 5000);
+        }
     }
-  }
-  const lineTimer = setInterval(showNextLine, 1800);
 
-  // Animate progress bar
-  let progress = 0;
-  const progressTimer = setInterval(() => {
-    progress = Math.min(progress + Math.random() * 8, 88);
-    progressBar.style.width = progress + '%';
-  }, 800);
-
-  // Start processing
-  fetch('/reviews/' + reviewId + '/process', {
-    method: 'POST',
-    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-  })
-  .then(r => r.json())
-  .then(data => {
-    clearInterval(lineTimer);
-    clearInterval(progressTimer);
-    progressBar.style.width = '100%';
-
-    if (data.status === 'complete') {
-      setTimeout(() => location.reload(), 600);
-    } else {
-      document.getElementById('process-title').textContent = 'エラーが発生しました';
-      document.getElementById('process-step').textContent = data.error || '処理に失敗しました。再度お試しください。';
-      document.getElementById('process-icon').textContent = '❌';
-    }
-  })
-  .catch(() => {
-    clearInterval(lineTimer);
-    clearInterval(progressTimer);
-    document.getElementById('process-title').textContent = '接続エラー';
-    document.getElementById('process-step').textContent = 'サーバーへの接続に失敗しました。';
-    document.getElementById('process-icon').textContent = '❌';
-  });
+    setTimeout(poll, 2000);
 })();
 </script>
+
+{{-- ===== COMPLETE STATE ===== --}}
+@elseif($review->status === 'complete')
+@php
+    $data  = $review->review_data ?? [];
+    $stats = $data['github_stats'] ?? [];
+    $overall = $review->overall_score;
+    $label   = $review->score_label;
+    $color   = $review->score_color;
+
+    $severityMeta = [
+        'critical'   => ['emoji' => '🟥', 'label' => 'Critical',    'cls' => 'sev-critical'],
+        'warning'    => ['emoji' => '🟧', 'label' => 'Warning',     'cls' => 'sev-warning'],
+        'suggestion' => ['emoji' => '🟨', 'label' => 'Suggestion',  'cls' => 'sev-suggestion'],
+    ];
+
+    $issues = $data['issues'] ?? [];
+    usort($issues, function($a, $b) {
+        $order = ['critical' => 0, 'warning' => 1, 'suggestion' => 2];
+        return ($order[$a['severity'] ?? 'suggestion'] ?? 2) <=> ($order[$b['severity'] ?? 'suggestion'] ?? 2);
+    });
+
+    $qScore = $review->quality_score ?? 0;
+    $sScore = $review->security_score ?? 0;
+    $mScore = $review->maintainability_score ?? 0;
+
+    $prMarkdown  = "## DevInsight AI コードレビュー\n\n";
+    $prMarkdown .= "**{$review->owner}/{$review->repo}** の自動レビュー結果です。\n\n";
+    $prMarkdown .= "### スコア\n";
+    $prMarkdown .= "| 総合 | 品質 | セキュリティ | 保守性 |\n";
+    $prMarkdown .= "|------|------|--------------|--------|\n";
+    $prMarkdown .= "| **{$overall}** | {$qScore} | {$sScore} | {$mScore} |\n\n";
+    if (!empty($issues)) {
+        $prMarkdown .= "### 検出された問題\n";
+        foreach ($issues as $issue) {
+            $sev = $issue['severity'] ?? 'suggestion';
+            $meta = $severityMeta[$sev] ?? $severityMeta['suggestion'];
+            $prMarkdown .= "- {$meta['emoji']} **[{$meta['label']}] {$issue['title']}** — {$issue['description']}\n";
+        }
+        $prMarkdown .= "\n";
+    }
+    $prMarkdown .= "> 🤖 Generated by [DevInsight AI](http://localhost:3003)";
+@endphp
+
+{{-- ① OVERALL SCORE (big headline) --}}
+<div class="overall-hero" style="--score-color: {{ $color }}">
+    <div class="overall-inner">
+        <div class="overall-number">{{ $overall }}</div>
+        <div class="overall-meta">
+            <div class="overall-label">{{ $label }}</div>
+            <div class="overall-repo">{{ $review->owner }}/{{ $review->repo }}</div>
+            <div class="overall-verdict">{{ $data['one_line_verdict'] ?? '' }}</div>
+        </div>
+    </div>
+</div>
+
+{{-- ② GITHUB STATS --}}
+@if(!empty($stats))
+<div class="github-stats-bar">
+    <div class="gs-item"><span class="gs-icon">⭐</span> <span class="gs-val">{{ number_format($stats['stars'] ?? 0) }}</span> <span class="gs-key">Stars</span></div>
+    <div class="gs-sep">·</div>
+    <div class="gs-item"><span class="gs-icon">🍴</span> <span class="gs-val">{{ number_format($stats['forks'] ?? 0) }}</span> <span class="gs-key">Forks</span></div>
+    <div class="gs-sep">·</div>
+    <div class="gs-item"><span class="gs-icon">📝</span> <span class="gs-val">{{ number_format($stats['commits'] ?? 0) }}</span> <span class="gs-key">Commits</span></div>
+    <div class="gs-sep">·</div>
+    <div class="gs-item"><span class="gs-icon">💬</span> <span class="gs-val">{{ number_format($stats['open_issues'] ?? 0) }}</span> <span class="gs-key">Issues</span></div>
+    @if(!empty($stats['language']))
+    <div class="gs-sep">·</div>
+    <div class="gs-item"><span class="gs-icon">🔵</span> <span class="gs-val">{{ $stats['language'] }}</span></div>
+    @endif
+    @if(!empty($data['framework']) && $data['framework'] !== 'Unknown' && $data['framework'] !== 'なし')
+    <div class="gs-sep">·</div>
+    <div class="gs-item"><span class="gs-badge">{{ $data['framework'] }}</span></div>
+    @endif
+</div>
+@endif
+
+{{-- INDIVIDUAL SCORES --}}
+<div class="scores-row">
+    @foreach([
+        ['label'=>'品質','score'=>$qScore,'icon'=>'✦'],
+        ['label'=>'セキュリティ','score'=>$sScore,'icon'=>'🛡'],
+        ['label'=>'保守性','score'=>$mScore,'icon'=>'⚙']
+    ] as $sc)
+    @php
+        $sc_color = $sc['score'] >= 80 ? '#00ff88' : ($sc['score'] >= 60 ? '#4488ff' : ($sc['score'] >= 40 ? '#ffaa00' : '#ff4466'));
+        $offset = 283 * (1 - $sc['score'] / 100);
+    @endphp
+    <div class="score-ring-card">
+        <svg viewBox="0 0 100 100" width="90" height="90">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="#1a1a2e" stroke-width="8"/>
+            <circle cx="50" cy="50" r="45" fill="none" stroke="{{ $sc_color }}" stroke-width="8"
+                stroke-dasharray="283" stroke-dashoffset="{{ $offset }}"
+                stroke-linecap="round" transform="rotate(-90 50 50)"
+                style="filter: drop-shadow(0 0 4px {{ $sc_color }})"/>
+            <text x="50" y="54" text-anchor="middle" fill="{{ $sc_color }}" font-size="20" font-weight="bold" font-family="monospace">{{ $sc['score'] }}</text>
+        </svg>
+        <div class="score-ring-label">{{ $sc['icon'] }} {{ $sc['label'] }}</div>
+    </div>
+    @endforeach
+</div>
+
+{{-- SUMMARY --}}
+@if(!empty($data['summary']))
+<div class="section-card">
+    <div class="section-title">📋 概要</div>
+    <p class="summary-text">{{ $data['summary'] }}</p>
+</div>
+@endif
+
+{{-- ③ ISSUES with severity --}}
+@if(!empty($issues))
+<div class="section-card">
+    <div class="section-title">🔍 検出された問題 ({{ count($issues) }}件)</div>
+    <div class="issues-list">
+        @foreach($issues as $idx => $issue)
+        @php
+            $sev = $issue['severity'] ?? 'suggestion';
+            $meta = $severityMeta[$sev] ?? $severityMeta['suggestion'];
+        @endphp
+        <div class="issue-card {{ $meta['cls'] }}" id="issue-{{ $idx }}">
+            <div class="issue-header">
+                <span class="issue-sev-badge">{{ $meta['emoji'] }} {{ $meta['label'] }}</span>
+                @if(!empty($issue['file']))
+                <span class="issue-file">📄 {{ $issue['file'] }}</span>
+                @endif
+            </div>
+            <div class="issue-title">{{ $issue['title'] }}</div>
+            <div class="issue-desc">{{ $issue['description'] }}</div>
+            {{-- ④ Fix with AI button --}}
+            <div class="issue-actions">
+                <button class="btn-fix-ai"
+                    onclick="fixWithAI({{ $idx }}, {{ json_encode($issue['title']) }}, {{ json_encode($issue['description']) }}, {{ json_encode($issue['file'] ?? '') }})">
+                    ✨ Fix with AI
+                </button>
+            </div>
+            <div class="fix-result" id="fix-result-{{ $idx }}" style="display:none"></div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
+{{-- STRENGTHS --}}
+@if(!empty($data['strengths']))
+<div class="section-card">
+    <div class="section-title">✅ 良い点</div>
+    <ul class="bullet-list">
+        @foreach($data['strengths'] as $s)
+        <li>{{ $s }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
+{{-- REFACTOR --}}
+@if(!empty($data['refactor_suggestions']))
+<div class="section-card">
+    <div class="section-title">🔧 リファクタ提案</div>
+    <ul class="bullet-list">
+        @foreach($data['refactor_suggestions'] as $r)
+        <li>{{ $r }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
+{{-- SECURITY NOTES --}}
+@if(!empty($data['security_notes']))
+<div class="section-card">
+    <div class="section-title">🔒 セキュリティ注意点</div>
+    <ul class="bullet-list security-list">
+        @foreach($data['security_notes'] as $n)
+        <li>{{ $n }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
+{{-- ⑤ PR COMMENT OUTPUT --}}
+<div class="section-card">
+    <div class="section-title">📤 PRコメント出力</div>
+    <p class="pr-desc">このレビューをGitHub PRコメントとして貼り付けられるMarkdown形式で出力します。</p>
+    <div class="pr-actions">
+        <button class="btn-pr" onclick="copyPRComment()">📋 PRコメント形式でコピー</button>
+        <span class="copy-feedback" id="copy-feedback"></span>
+    </div>
+    <textarea id="pr-markdown" class="pr-textarea" readonly>{{ $prMarkdown }}</textarea>
+</div>
+
+{{-- BACK / NAV --}}
+<div class="back-row">
+    <a href="{{ route('reviews.index') }}" class="btn-back">← 新しいレビューを開始</a>
+    <a href="{{ route('ranking') }}" class="btn-ranking">🏆 ランキング</a>
+</div>
+
+{{-- ===== FAILED STATE ===== --}}
+@else
+<div class="failed-card">
+    <div class="failed-icon">❌</div>
+    <h2>解析に失敗しました</h2>
+    <p>{{ $review->owner }}/{{ $review->repo }}</p>
+    <a href="{{ route('reviews.index') }}" class="btn-back">← 再試行</a>
+</div>
+@endif
+
+</div>
+
+@if($review->status === 'complete')
+<script>
+const CSRF = "{{ csrf_token() }}";
+const FIX_URL = "{{ route('reviews.fix', $review) }}";
+
+async function fixWithAI(idx, title, desc, file) {
+    const btn = document.querySelector(`#issue-${idx} .btn-fix-ai`);
+    const resultDiv = document.getElementById(`fix-result-${idx}`);
+
+    btn.disabled = true;
+    btn.textContent = '⏳ AIが修正中...';
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="fix-loading">Claude が修正案を生成中...</div>';
+
+    try {
+        const res = await fetch(FIX_URL, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': CSRF,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ issue_title: title, issue_desc: desc, file: file }),
+        });
+        const json = await res.json();
+        if (json.status === 'ok') {
+            resultDiv.innerHTML = `<div class="fix-output"><pre><code>${escapeHtml(json.fix)}</code></pre></div>`;
+            btn.textContent = '✅ 修正済み';
+        } else {
+            resultDiv.innerHTML = `<div class="fix-error">エラー: ${escapeHtml(json.message || 'Unknown error')}</div>`;
+            btn.disabled = false;
+            btn.textContent = '✨ Fix with AI';
+        }
+    } catch(e) {
+        resultDiv.innerHTML = `<div class="fix-error">通信エラーが発生しました</div>`;
+        btn.disabled = false;
+        btn.textContent = '✨ Fix with AI';
+    }
+}
+
+function copyPRComment() {
+    const ta = document.getElementById('pr-markdown');
+    ta.select();
+    navigator.clipboard.writeText(ta.value).then(() => {
+        const fb = document.getElementById('copy-feedback');
+        fb.textContent = '✅ コピーしました！';
+        setTimeout(() => fb.textContent = '', 2500);
+    }).catch(() => {
+        document.execCommand('copy');
+        const fb = document.getElementById('copy-feedback');
+        fb.textContent = '✅ コピーしました！';
+        setTimeout(() => fb.textContent = '', 2500);
+    });
+}
+
+function escapeHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+@endif
+
+<style>
+.show-page { max-width: 860px; margin: 0 auto; padding: 0 16px 60px; }
+
+/* Processing */
+.processing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; max-width: 600px; margin: 60px auto; text-align: center; }
+.processing-header .proc-icon { font-size: 3rem; margin-bottom: 12px; animation: pulse 1.5s infinite; }
+.processing-header h2 { font-size: 1.6rem; color: var(--cyan); margin: 0 0 6px; }
+.proc-repo { color: var(--text-muted); font-family: monospace; }
+.console-box { background: #000; border: 1px solid #333; border-radius: 8px; padding: 16px; height: 160px; overflow-y: auto; text-align: left; margin: 24px 0 16px; }
+.console-line { font-family: monospace; font-size: 0.8rem; color: #00ff88; margin-bottom: 4px; }
+.progress-bar-wrap { background: #1a1a2e; border-radius: 99px; height: 8px; overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--blue)); border-radius: 99px; transition: width 0.4s; }
+.progress-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 8px; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ① Overall Hero */
+.overall-hero { border-radius: 20px; background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(10,10,30,0.8) 100%); border: 2px solid var(--score-color, #4488ff); box-shadow: 0 0 40px color-mix(in srgb, var(--score-color, #4488ff) 30%, transparent); padding: 36px 40px; margin: 32px 0 16px; }
+.overall-inner { display: flex; align-items: center; gap: 32px; }
+.overall-number { font-size: 5rem; font-weight: 900; font-family: monospace; color: var(--score-color, #4488ff); text-shadow: 0 0 30px var(--score-color, #4488ff); line-height: 1; min-width: 140px; }
+.overall-label { font-size: 1.6rem; font-weight: 700; color: var(--score-color, #4488ff); letter-spacing: 3px; text-transform: uppercase; }
+.overall-repo { font-family: monospace; color: var(--text-muted); font-size: 1rem; margin-top: 4px; }
+.overall-verdict { color: #ccc; font-style: italic; margin-top: 8px; font-size: 0.95rem; }
+
+/* ② GitHub Stats */
+.github-stats-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; }
+.gs-item { display: flex; align-items: center; gap: 5px; font-size: 0.9rem; }
+.gs-icon { font-size: 1rem; }
+.gs-val { font-weight: 700; color: #fff; font-family: monospace; }
+.gs-key { color: var(--text-muted); font-size: 0.8rem; }
+.gs-sep { color: var(--border); font-size: 1.2rem; }
+.gs-badge { background: var(--blue); color: #fff; border-radius: 99px; padding: 2px 10px; font-size: 0.78rem; font-weight: 600; }
+
+/* Individual scores */
+.scores-row { display: flex; gap: 16px; justify-content: center; margin-bottom: 28px; }
+.score-ring-card { display: flex; flex-direction: column; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; padding: 20px 28px; }
+.score-ring-label { font-size: 0.82rem; color: var(--text-muted); text-align: center; }
+
+/* Sections */
+.section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+.section-title { font-size: 1rem; font-weight: 700; color: var(--cyan); margin-bottom: 16px; letter-spacing: 0.5px; }
+.summary-text { color: #ccc; line-height: 1.7; margin: 0; }
+.bullet-list { margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8; }
+.security-list li { color: #ffaa88; }
+
+/* ③ Issues */
+.issues-list { display: flex; flex-direction: column; gap: 14px; }
+.issue-card { border-radius: 10px; padding: 16px; border-left: 4px solid; }
+.sev-critical   { background: rgba(255,50,80,0.08);  border-color: #ff3250; }
+.sev-warning    { background: rgba(255,140,0,0.08);  border-color: #ff8c00; }
+.sev-suggestion { background: rgba(255,220,0,0.07); border-color: #ffdc00; }
+.issue-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.issue-sev-badge { font-size: 0.82rem; font-weight: 700; }
+.sev-critical .issue-sev-badge   { color: #ff6680; }
+.sev-warning .issue-sev-badge    { color: #ffaa44; }
+.sev-suggestion .issue-sev-badge { color: #ffdd44; }
+.issue-file { font-family: monospace; font-size: 0.78rem; color: var(--text-muted); background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; }
+.issue-title { font-weight: 700; color: #fff; margin-bottom: 6px; font-size: 0.95rem; }
+.issue-desc { color: #aaa; font-size: 0.88rem; line-height: 1.6; }
+.issue-actions { margin-top: 12px; }
+
+/* ④ Fix with AI */
+.btn-fix-ai { background: linear-gradient(135deg, #7b2ff7, #4488ff); border: none; color: #fff; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: opacity 0.2s, transform 0.1s; }
+.btn-fix-ai:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); }
+.btn-fix-ai:disabled { opacity: 0.5; cursor: default; }
+.fix-result { margin-top: 12px; }
+.fix-loading { color: var(--cyan); font-size: 0.85rem; padding: 10px; }
+.fix-output pre { background: #0a0a1a; border: 1px solid #333; border-radius: 8px; padding: 14px; overflow-x: auto; margin: 0; }
+.fix-output code { font-family: monospace; font-size: 0.82rem; color: #e6e6ff; white-space: pre-wrap; word-break: break-word; }
+.fix-error { color: #ff6680; font-size: 0.85rem; padding: 10px; }
+
+/* ⑤ PR Comment */
+.pr-desc { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 14px; }
+.pr-actions { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.btn-pr { background: #238636; border: none; color: #fff; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: background 0.2s; }
+.btn-pr:hover { background: #2ea043; }
+.copy-feedback { color: #00ff88; font-size: 0.85rem; font-weight: 600; }
+.pr-textarea { width: 100%; height: 200px; background: #0a0a1a; border: 1px solid #333; border-radius: 8px; color: #ccc; font-family: monospace; font-size: 0.8rem; padding: 12px; resize: vertical; box-sizing: border-box; }
+
+/* Failed */
+.failed-card { text-align: center; padding: 80px 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; max-width: 500px; margin: 60px auto; }
+.failed-icon { font-size: 3rem; margin-bottom: 16px; }
+
+/* Nav */
+.back-row { display: flex; gap: 12px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
+.btn-back { background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text-muted); padding: 10px 22px; border-radius: 8px; text-decoration: none; font-size: 0.88rem; transition: background 0.2s; }
+.btn-back:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-ranking { background: rgba(255,170,0,0.1); border: 1px solid rgba(255,170,0,0.3); color: #ffaa00; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-size: 0.88rem; transition: background 0.2s; }
+.btn-ranking:hover { background: rgba(255,170,0,0.2); }
+
+@media (max-width: 600px) {
+    .overall-inner { flex-direction: column; text-align: center; gap: 16px; }
+    .overall-number { font-size: 4rem; min-width: unset; }
+    .scores-row { flex-direction: column; align-items: center; }
+    .github-stats-bar { gap: 8px; }
+}
+</style>
 @endsection

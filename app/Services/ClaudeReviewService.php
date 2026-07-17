@@ -6,38 +6,36 @@ use Illuminate\Support\Facades\Http;
 
 class ClaudeReviewService
 {
-    private string $apiKey;
     private string $model = 'claude-sonnet-4-6';
     private string $endpoint = 'https://api.anthropic.com/v1/messages';
 
-    public function __construct()
-    {
-        $this->apiKey = env('ANTHROPIC_API_KEY', '');
-    }
-
     public function review(string $owner, string $repo, array $files): array
     {
-        $prompt = $this->buildPrompt($owner, $repo, $files);
-
-        $response = Http::withHeaders([
-            'x-api-key'         => $this->apiKey,
-            'anthropic-version' => '2023-06-01',
-            'content-type'      => 'application/json',
-        ])->timeout(120)->post($this->endpoint, [
-            'model'      => $this->model,
-            'max_tokens' => 2048,
-            'messages'   => [['role' => 'user', 'content' => $prompt]],
-        ]);
-
-        if (!$response->successful()) {
-            throw new \RuntimeException('Claude API error: ' . $response->status());
-        }
-
-        $text = $response->json('content.0.text', '');
-        return $this->parseResponse($text);
+        $text = $this->call($this->buildReviewPrompt($owner, $repo, $files));
+        return $this->parseJson($text, $this->defaultReview());
     }
 
-    private function buildPrompt(string $owner, string $repo, array $files): string
+    public function fixIssue(string $issueTitle, string $issueDesc, array $files): string
+    {
+        $fileContents = '';
+        foreach ($files as $path => $content) {
+            $fileContents .= "\n\n### {$path}\n```\n" . mb_substr($content, 0, 4000) . "\n```";
+        }
+
+        $prompt = <<<PROMPT
+以下の問題を修正してください。修正後のコード全体をMarkdownコードブロックで出力してください。
+説明は最小限にして、コードをメインに出力してください。
+
+**問題:** {$issueTitle}
+**詳細:** {$issueDesc}
+
+**対象ファイル:**{$fileContents}
+PROMPT;
+
+        return $this->call($prompt);
+    }
+
+    private function buildReviewPrompt(string $owner, string $repo, array $files): string
     {
         $fileContents = '';
         foreach ($files as $path => $content) {
@@ -59,38 +57,69 @@ JSONのみを出力し、マークダウンコードブロック（```）や説�
   "summary": "リポジトリの概要（1〜2文）",
   "strengths": ["良い点1", "良い点2", "良い点3"],
   "issues": [
-    {"severity": "high|medium|low", "title": "問題のタイトル", "description": "説明"}
+    {
+      "severity": "critical|warning|suggestion",
+      "title": "問題のタイトル",
+      "description": "説明",
+      "file": "該当ファイル名（不明な場合はnull）"
+    }
   ],
   "refactor_suggestions": ["リファクタ提案1", "リファクタ提案2", "リファクタ提案3"],
   "security_notes": ["セキュリティ注意点1", "セキュリティ注意点2"],
   "one_line_verdict": "総評を一言で（辛口OKでユーモアも可）"
 }
 
+重要：issueのseverityは必ず critical / warning / suggestion のいずれかを使用してください。
+
 分析対象のファイル：{$fileContents}
 PROMPT;
     }
 
-    private function parseResponse(string $text): array
+    private function call(string $prompt): string
     {
-        $cleaned = preg_replace('/^```(?:json)?\n?|\n?```$/s', '', trim($text));
-        $data = json_decode($cleaned, true);
+        $response = Http::withHeaders([
+            'x-api-key'         => env('ANTHROPIC_API_KEY'),
+            'anthropic-version' => '2023-06-01',
+            'content-type'      => 'application/json',
+        ])->timeout(120)->post($this->endpoint, [
+            'model'      => $this->model,
+            'max_tokens' => 2048,
+            'messages'   => [['role' => 'user', 'content' => $prompt]],
+        ]);
 
-        if (!$data) {
-            return [
-                'language' => 'Unknown',
-                'framework' => 'Unknown',
-                'quality_score' => 50,
-                'security_score' => 50,
-                'maintainability_score' => 50,
-                'summary' => 'レビューの解析に失敗しました。',
-                'strengths' => [],
-                'issues' => [],
-                'refactor_suggestions' => [],
-                'security_notes' => [],
-                'one_line_verdict' => 'Parse error',
-            ];
+        if (!$response->successful()) {
+            throw new \RuntimeException('Claude API error: ' . $response->status());
         }
 
-        return $data;
+        return $response->json('content.0.text', '');
+    }
+
+    private function parseJson(string $text, array $default): array
+    {
+        // strip markdown fences
+        $cleaned = preg_replace('/^```(?:json)?\n?|\n?```$/s', '', trim($text));
+        $data = json_decode($cleaned, true);
+        if ($data) return $data;
+
+        // fallback: extract first { ... } block
+        if (preg_match('/\{.+\}/s', $cleaned, $m)) {
+            $data = json_decode($m[0], true);
+            if ($data) return $data;
+        }
+
+        \Log::warning('ClaudeReviewService: JSON parse failed', ['raw' => mb_substr($text, 0, 500)]);
+        return $default;
+    }
+
+    private function defaultReview(): array
+    {
+        return [
+            'language' => 'Unknown', 'framework' => 'Unknown',
+            'quality_score' => 50, 'security_score' => 50, 'maintainability_score' => 50,
+            'summary' => 'レビューの解析に失敗しました。',
+            'strengths' => [], 'issues' => [],
+            'refactor_suggestions' => [], 'security_notes' => [],
+            'one_line_verdict' => 'Parse error',
+        ];
     }
 }

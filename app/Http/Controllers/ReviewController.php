@@ -12,21 +12,15 @@ class ReviewController extends Controller
     public function index()
     {
         $popular = Review::where('status', 'complete')
-            ->orderBy('view_count', 'desc')
-            ->limit(6)
-            ->get();
-
+            ->orderBy('view_count', 'desc')->limit(6)->get();
         return view('reviews.index', compact('popular'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'github_url' => 'required|string|max:500',
-        ]);
+        $request->validate(['github_url' => 'required|string|max:500']);
 
         $github = new GitHubService();
-
         try {
             ['owner' => $owner, 'repo' => $repo] = $github->parseUrl($request->github_url);
         } catch (\InvalidArgumentException $e) {
@@ -62,35 +56,34 @@ class ReviewController extends Controller
             $github = new GitHubService();
             $claude = new ClaudeReviewService();
 
-            // Get repo info
-            $repoInfo = $github->getRepoInfo($review->owner, $review->repo);
-            $branch   = $repoInfo['default_branch'] ?? 'main';
+            // GitHub stats + repo info
+            $stats  = $github->getRepoStats($review->owner, $review->repo);
+            $branch = $stats['default_branch'];
 
-            // Get file tree and select key files
-            $tree     = $github->getFileTree($review->owner, $review->repo, $branch);
-            $paths    = $github->selectKeyFiles($tree);
+            // File tree + key files
+            $tree  = $github->getFileTree($review->owner, $review->repo, $branch);
+            $paths = $github->selectKeyFiles($tree);
 
-            // Fetch file contents
             $files = [];
             foreach ($paths as $path) {
                 try {
                     $files[$path] = $github->getFileContent($review->owner, $review->repo, $path);
-                } catch (\Exception) {
-                    // Skip unreadable files
-                }
+                } catch (\Exception) {}
             }
 
             // Claude review
             $data = $claude->review($review->owner, $review->repo, $files);
+            $data['github_stats'] = $stats;
+            $data['analyzed_files'] = array_keys($files);
 
             $review->update([
-                'status'                 => 'complete',
-                'language'               => $data['language'] ?? null,
-                'quality_score'          => $data['quality_score'] ?? null,
-                'security_score'         => $data['security_score'] ?? null,
-                'maintainability_score'  => $data['maintainability_score'] ?? null,
-                'branch'                 => $branch,
-                'review_data'            => $data,
+                'status'                => 'complete',
+                'language'              => $data['language'] ?? null,
+                'quality_score'         => $data['quality_score'] ?? null,
+                'security_score'        => $data['security_score'] ?? null,
+                'maintainability_score' => $data['maintainability_score'] ?? null,
+                'branch'                => $branch,
+                'review_data'           => $data,
             ]);
 
             return response()->json(['status' => 'complete', 'data' => $data]);
@@ -101,13 +94,38 @@ class ReviewController extends Controller
         }
     }
 
+    public function fix(Request $request, Review $review)
+    {
+        $request->validate([
+            'issue_title' => 'required|string',
+            'issue_desc'  => 'required|string',
+            'file'        => 'nullable|string',
+        ]);
+
+        try {
+            $github = new GitHubService();
+            $claude = new ClaudeReviewService();
+
+            $files = [];
+            if ($request->file && $review->review_data) {
+                try {
+                    $content = $github->getFileContent($review->owner, $review->repo, $request->file);
+                    $files[$request->file] = $content;
+                } catch (\Exception) {}
+            }
+
+            $fixed = $claude->fixIssue($request->issue_title, $request->issue_desc, $files);
+            return response()->json(['status' => 'ok', 'fix' => $fixed]);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+
     public function ranking()
     {
         $reviews = Review::where('status', 'complete')
-            ->orderBy('view_count', 'desc')
-            ->limit(20)
-            ->get();
-
+            ->orderBy('view_count', 'desc')->limit(20)->get();
         return view('reviews.ranking', compact('reviews'));
     }
 }

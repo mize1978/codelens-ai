@@ -35,9 +35,9 @@ class Review extends Model
     public function getScoreColorAttribute(): string
     {
         $score = $this->overall_score;
-        if ($score >= 80) return 'green';
-        if ($score >= 60) return 'blue';
-        if ($score >= 40) return 'yellow';
-        return 'red';
+        if ($score >= 80) return '#00ff88';
+        if ($score >= 60) return '#4488ff';
+        if ($score >= 40) return '#ffaa00';
+        return '#ff4466';
     }
 }
