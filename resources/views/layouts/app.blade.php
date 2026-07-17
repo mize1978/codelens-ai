@@ -110,7 +110,33 @@
 
     @keyframes pulse-active    { 0%,100%{box-shadow:0 0 0 0 rgba(0,255,136,0.6)}  50%{box-shadow:0 0 0 4px rgba(0,255,136,0)} }
     @keyframes pulse-reviewing { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    @keyframes pulse-thinking  { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:0.5; transform:scale(1.5)} }
+    @keyframes pulse-thinking  { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:0.5; transform:scale(1.6)} }
+
+    /* ACTIVE: 呼吸グロー */
+    @keyframes breathe-active {
+      0%,100% { box-shadow: 0 0 0 0 rgba(0,255,136,0); }
+      50%      { box-shadow: 0 0 8px 2px rgba(0,255,136,0.25); }
+    }
+    .status-pill[data-state="active"] { animation: breathe-active 3s ease-in-out infinite; }
+
+    /* REVIEWING: 青いラインが流れる */
+    @keyframes shimmer-review {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
+    }
+    .status-pill[data-state="reviewing"] {
+      background: linear-gradient(90deg, transparent 0%, rgba(68,136,255,0.15) 40%, rgba(0,200,255,0.2) 50%, rgba(68,136,255,0.15) 60%, transparent 100%);
+      background-size: 200% auto;
+      animation: shimmer-review 1.4s linear infinite;
+    }
+
+    /* COMPLETE: 金色フラッシュ */
+    @keyframes flash-complete {
+      0%   { box-shadow: 0 0 0 0 rgba(255,204,0,0); }
+      30%  { box-shadow: 0 0 16px 4px rgba(255,204,0,0.6); }
+      100% { box-shadow: 0 0 0 0 rgba(255,204,0,0); }
+    }
+    .status-pill[data-state="complete"] { animation: flash-complete 0.8s ease-out forwards; }
 
     /* HUD tooltip */
     .status-hud {
@@ -316,8 +342,10 @@
         <div class="hud-title">CodeLens Engine</div>
         <div class="hud-row"><span>Status</span><span id="hud-status">Online</span></div>
         <div class="hud-row"><span>Version</span><span>v0.4</span></div>
-        <div class="hud-row"><span>Model</span><span>Claude</span></div>
+        <div class="hud-row"><span>Model</span><span>Claude Sonnet</span></div>
         <div class="hud-row"><span>Latency</span><span id="hud-latency">—</span></div>
+        <div class="hud-row" id="hud-repo-row" style="display:none"><span>Repository</span><span id="hud-repo">—</span></div>
+        <div class="hud-row" id="hud-files-row" style="display:none"><span>Files</span><span id="hud-files">—</span></div>
       </div>
     </div>
   </header>
@@ -328,37 +356,61 @@
 <script>
 // CodeLens Status Controller
 window.CodeLensStatus = (function () {
-  const pill    = document.getElementById('cl-status');
-  const label   = pill.querySelector('.status-label');
-  const hudStat = document.getElementById('hud-status');
-  const hudLat  = document.getElementById('hud-latency');
-  let _startTime = null;
+  const pill     = document.getElementById('cl-status');
+  const label    = pill.querySelector('.status-label');
+  const hudStat  = document.getElementById('hud-status');
+  const hudLat   = document.getElementById('hud-latency');
+  const hudRepo  = document.getElementById('hud-repo');
+  const hudFiles = document.getElementById('hud-files');
+  let _startTime     = null;
   let _completeTimer = null;
+  let _thinkTimer    = null;
 
-  const STATES = {
-    active:    { label: '🟢 CodeLens ACTIVE',  hud: 'Online',     state: 'active' },
-    reviewing: { label: '🔵 Reviewing...',      hud: 'Reviewing',  state: 'reviewing' },
-    thinking:  { label: '🟣 Thinking...',       hud: 'Thinking',   state: 'thinking' },
-    complete:  { label: '✨ Review Complete',   hud: 'Complete',   state: 'complete' },
-  };
+  // Thinking... ドットアニメ
+  let _thinkDot = 0;
+  function startThinkDots() {
+    _thinkDot = 0;
+    _thinkTimer = setInterval(() => {
+      _thinkDot = (_thinkDot + 1) % 4;
+      label.textContent = '🟣 Thinking' + '.'.repeat(_thinkDot || 1);
+    }, 400);
+  }
+  function stopThinkDots() {
+    if (_thinkTimer) { clearInterval(_thinkTimer); _thinkTimer = null; }
+  }
 
-  function set(key) {
+  // CodeLensくんセリフ更新（show.blade.php側のpm-textがあれば）
+  function setMascotSpeech(text) {
+    const el = document.getElementById('cl-speech');
+    if (el) { el.style.opacity = 0; setTimeout(() => { el.textContent = text; el.style.opacity = 1; }, 200); }
+  }
+
+  function set(key, meta) {
     if (_completeTimer) { clearTimeout(_completeTimer); _completeTimer = null; }
-    const s = STATES[key] || STATES.active;
-    pill.dataset.state = s.state;
-    label.textContent  = s.label;
-    if (hudStat) hudStat.textContent = s.hud;
+    stopThinkDots();
+    pill.dataset.state = key;
+    if (hudStat) hudStat.textContent = { active:'Online', reviewing:'Reviewing', thinking:'Thinking', complete:'Complete' }[key] || 'Online';
 
+    if (key === 'active') {
+      label.textContent = '🟢 CodeLens ACTIVE';
+      setMascotSpeech('なにか面白いコードはあるかな…');
+    }
     if (key === 'reviewing') {
+      label.textContent = '🔵 Reviewing...';
       _startTime = Date.now();
       hudLat && (hudLat.textContent = '—');
+      setMascotSpeech('READMEも見てみよう！');
+      if (meta?.repo)  { hudRepo.textContent = meta.repo;  document.getElementById('hud-repo-row').style.display = ''; }
+    }
+    if (key === 'thinking') {
+      startThinkDots();
+      setMascotSpeech('設計を確認中…');
     }
     if (key === 'complete') {
-      if (_startTime) {
-        const ms = ((Date.now() - _startTime) / 1000).toFixed(2);
-        hudLat && (hudLat.textContent = ms + 's');
-        _startTime = null;
-      }
+      label.textContent = '✨ Review Complete';
+      setMascotSpeech('いいコード、見つけた！！');
+      if (meta?.latency) hudLat && (hudLat.textContent = meta.latency + 's');
+      if (meta?.files)   { hudFiles.textContent = meta.files; document.getElementById('hud-files-row').style.display = ''; }
       _completeTimer = setTimeout(() => set('active'), 800);
     }
   }

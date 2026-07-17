@@ -296,7 +296,8 @@ document.getElementById('review-form').addEventListener('submit', function(e) {
   inputWrap.classList.add('scanning');
 
   // ステータス更新
-  if (window.CodeLensStatus) window.CodeLensStatus.set('reviewing');
+  const repoVal = document.getElementById('repo-input')?.value || document.querySelector('input[name="repo"]')?.value || '';
+  if (window.CodeLensStatus) window.CodeLensStatus.set('reviewing', { repo: repoVal });
 
   // ボタンシーケンス: ○ → ◎ → AI Analyzing...
   btn.textContent = '○';

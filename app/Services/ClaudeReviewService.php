@@ -8,6 +8,7 @@ class ClaudeReviewService
 {
     private string $model = 'claude-sonnet-4-6';
     private string $endpoint = 'https://api.anthropic.com/v1/messages';
+    public float $lastLatency = 0.0;
 
     public function review(string $owner, string $repo, array $files): array
     {
@@ -93,6 +94,8 @@ PROMPT;
 
     private function call(string $prompt): string
     {
+        $t0 = microtime(true);
+
         $response = Http::withHeaders([
             'x-api-key'         => env('ANTHROPIC_API_KEY'),
             'anthropic-version' => '2023-06-01',
@@ -102,6 +105,8 @@ PROMPT;
             'max_tokens' => 2048,
             'messages'   => [['role' => 'user', 'content' => $prompt]],
         ]);
+
+        $this->lastLatency = round(microtime(true) - $t0, 2);
 
         if (!$response->successful()) {
             throw new \RuntimeException('Claude API error: ' . $response->status());

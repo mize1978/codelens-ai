@@ -86,7 +86,12 @@ class ReviewController extends Controller
                 'review_data'           => $data,
             ]);
 
-            return response()->json(['status' => 'complete', 'data' => $data]);
+            return response()->json([
+                'status'  => 'complete',
+                'data'    => $data,
+                'latency' => $claude->lastLatency,
+                'files'   => count($files),
+            ]);
 
         } catch (\Exception $e) {
             $review->update(['status' => 'failed']);
