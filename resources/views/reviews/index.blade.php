@@ -107,11 +107,7 @@
   {{-- CodeLens Library --}}
   <div class="library-section">
     <div class="library-header">
-      <span class="lib-title-icon">📚</span>
-      <div>
-        <p class="lib-title">CodeLens Library</p>
-        <p class="lib-subtitle">すべての記録はここに宿る</p>
-      </div>
+      <p class="lib-title">CodeLens Library</p>
     </div>
 
     <div class="library-shelf">
