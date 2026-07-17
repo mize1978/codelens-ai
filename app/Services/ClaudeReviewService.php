@@ -15,7 +15,7 @@ class ClaudeReviewService
         return $this->parseJson($text, $this->defaultReview());
     }
 
-    public function fixIssue(string $issueTitle, string $issueDesc, array $files): string
+    public function fixIssue(string $issueTitle, string $issueDesc, array $files): array
     {
         $fileContents = '';
         foreach ($files as $path => $content) {
@@ -23,8 +23,16 @@ class ClaudeReviewService
         }
 
         $prompt = <<<PROMPT
-以下の問題を修正してください。修正後のコード全体をMarkdownコードブロックで出力してください。
-説明は最小限にして、コードをメインに出力してください。
+以下の問題について、修正前・修正後・差分を提示してください。
+JSONのみで応答してください（マークダウンコードブロック不要）。
+
+{
+  "before": "問題のあるコードスニペット（10〜25行）",
+  "after": "修正後のコードスニペット（同程度の行数）",
+  "diff": "統一diff形式。変更行は先頭に - または + を付け、文脈行は先頭にスペース。例:\n  SECRET_KEY_BASE=dummy\n- RUN bundle exec rails assets:precompile\n+ ARG SECRET_KEY_BASE\n+ RUN SECRET_KEY_BASE=\$SECRET_KEY_BASE bundle exec rails assets:precompile",
+  "score_delta": estimated improvement to overall score (integer 1-15) if this fix is applied,
+  "explanation": "修正のポイントを1〜2文で"
+}
 
 **問題:** {$issueTitle}
 **詳細:** {$issueDesc}
@@ -32,7 +40,15 @@ class ClaudeReviewService
 **対象ファイル:**{$fileContents}
 PROMPT;
 
-        return $this->call($prompt);
+        $text = $this->call($prompt);
+        $data = $this->parseJson($text, []);
+
+        if (!empty($data['before']) && !empty($data['after'])) {
+            return $data;
+        }
+
+        // fallback: 旧形式（コードブロックのみ）
+        return ['before' => null, 'after' => $text, 'explanation' => null];
     }
 
     private function buildReviewPrompt(string $owner, string $repo, array $files): string

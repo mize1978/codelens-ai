@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', $review->owner.'/'.$review->repo.' — DevInsight AI')
+@section('title', $review->owner.'/'.$review->repo.' — CodeLens AI')
 
 @section('content')
 <div class="show-page">
@@ -14,12 +14,19 @@
             <p class="proc-repo">{{ $review->owner }}/{{ $review->repo }}</p>
         </div>
         <div class="console-box" id="console-box">
-            <div class="console-line">[INIT] DevInsight AI v2.0 起動中...</div>
+            <div class="console-line">[INIT] CodeLens AI v2.0 起動中...</div>
         </div>
         <div class="progress-bar-wrap">
             <div class="progress-bar" id="progress-bar" style="width:0%"></div>
         </div>
         <p class="progress-label" id="progress-label">0%</p>
+        <div class="proc-mascot">
+            <div class="pm-main-wrap">
+                <img src="/images/cl-main.png" class="pm-main-img" alt="CodeLensくん">
+                <div class="pm-glint" id="pm-glint"></div>
+            </div>
+            <p class="pm-text" id="pm-text"></p>
+        </div>
     </div>
 </div>
 
@@ -27,6 +34,37 @@
 (function() {
     const url = "{{ route('reviews.process', $review) }}";
     const token = "{{ csrf_token() }}";
+
+    // CodeLensくん ステージ別セリフ
+    const stages = [
+        { from: 0,  text: 'いいコードあるかな…' },
+        { from: 18, text: 'READMEも見てみよう！' },
+        { from: 43, text: 'おっ、設計がきれい！' },
+        { from: 82, text: 'もう少し詳しく見てみるね…' },
+    ];
+    const pmEl = document.getElementById('pm-text');
+    let currentStageIdx = -1;
+    function setStageText(idx) {
+        if (idx === currentStageIdx || !pmEl) return;
+        currentStageIdx = idx;
+        pmEl.style.transition = 'opacity 0.35s';
+        pmEl.style.opacity = '0';
+        setTimeout(() => { pmEl.textContent = stages[idx].text; pmEl.style.opacity = '1'; }, 360);
+    }
+    setStageText(0);
+
+    // ⑤ ロゴスピン開始
+    document.querySelectorAll('.logo-icon').forEach(el => el.classList.add('spinning'));
+
+    // 虫眼鏡キラッ（4秒ごと）
+    const glint = document.getElementById('pm-glint');
+    if (glint) {
+        setInterval(() => {
+            glint.classList.remove('flash');
+            void glint.offsetWidth;
+            glint.classList.add('flash');
+        }, 4000);
+    }
     const consoleBox = document.getElementById('console-box');
     const bar = document.getElementById('progress-bar');
     const label = document.getElementById('progress-label');
@@ -51,12 +89,23 @@
         }, delay);
     });
 
+    // プログレス — 速度をステージで変える（合計 ~80s）
     let pct = 0;
+    function getIncrement(p) {
+        if (p < 18) return 1.0;   // 0→18: ~5.4s
+        if (p < 43) return 0.38;  // 18→43: ~19.7s
+        if (p < 82) return 0.16;  // 43→82: ~48.8s
+        return 0.07;               // 82→92: じわじわ
+    }
     const pctInterval = setInterval(() => {
-        pct = Math.min(pct + 1, 92);
-        bar.style.width = pct + '%';
-        label.textContent = pct + '%';
-    }, 200);
+        pct = Math.min(pct + getIncrement(pct), 92);
+        const d = Math.floor(pct);
+        bar.style.width = d + '%';
+        label.textContent = d + '%';
+        for (let i = stages.length - 1; i >= 0; i--) {
+            if (d >= stages[i].from) { setStageText(i); break; }
+        }
+    }, 300);
 
     async function poll() {
         try {
@@ -67,9 +116,39 @@
             const json = await res.json();
             if (json.status === 'complete' || json.status === 'failed') {
                 clearInterval(pctInterval);
-                bar.style.width = '100%';
-                label.textContent = '100%';
-                setTimeout(() => location.reload(), 400);
+                document.querySelectorAll('.logo-icon').forEach(el => el.classList.remove('spinning'));
+
+                // 95% → 100% の一瞬演出
+                bar.style.width = '95%';
+                label.textContent = '95%';
+                // ✨ 200ms フラッシュ
+                const mascotImg = document.querySelector('.pm-main-img');
+                if (mascotImg) {
+                    mascotImg.classList.remove('found');
+                    void mascotImg.offsetWidth;
+                    mascotImg.classList.add('found');
+                    setTimeout(() => mascotImg.classList.remove('found'), 250);
+                }
+                if (pmEl) {
+                    pmEl.style.transition = 'opacity 0.25s';
+                    pmEl.style.opacity = '0';
+                    setTimeout(() => { pmEl.textContent = 'ほぼ見つかった！'; pmEl.style.opacity = '1'; }, 260);
+                }
+                setTimeout(() => {
+                    bar.style.width = '100%';
+                    label.textContent = '100%';
+                    if (pmEl) {
+                        pmEl.style.opacity = '0';
+                        setTimeout(() => { pmEl.textContent = '見つけた！！'; pmEl.style.opacity = '1'; }, 260);
+                    }
+                }, 750);
+
+                if (json.status === 'complete') {
+                    setTimeout(() => showReviewComplete(() => location.reload()), 1100);
+                } else {
+                    showMascot('/images/cl-sleep.png', '今日はちょっと難しいコードかも…', 3000);
+                    setTimeout(() => location.reload(), 3400);
+                }
             } else {
                 setTimeout(poll, 3000);
             }
@@ -107,7 +186,7 @@
     $sScore = $review->security_score ?? 0;
     $mScore = $review->maintainability_score ?? 0;
 
-    $prMarkdown  = "## DevInsight AI コードレビュー\n\n";
+    $prMarkdown  = "## CodeLens AI Code Review\n\n";
     $prMarkdown .= "**{$review->owner}/{$review->repo}** の自動レビュー結果です。\n\n";
     $prMarkdown .= "### スコア\n";
     $prMarkdown .= "| 総合 | 品質 | セキュリティ | 保守性 |\n";
@@ -122,13 +201,13 @@
         }
         $prMarkdown .= "\n";
     }
-    $prMarkdown .= "> 🤖 Generated by [DevInsight AI](http://localhost:3003)";
+    $prMarkdown .= "> 🤖 Generated with [CodeLens AI](http://localhost:3003) — crafted by Mize";
 @endphp
 
 {{-- ① OVERALL SCORE (big headline) --}}
 <div class="overall-hero" style="--score-color: {{ $color }}">
     <div class="overall-inner">
-        <div class="overall-number">{{ $overall }}</div>
+        <div class="overall-number" id="score-overall" data-target="{{ $overall }}">0</div>
         <div class="overall-meta">
             <div class="overall-label">{{ $label }}</div>
             <div class="overall-repo">{{ $review->owner }}/{{ $review->repo }}</div>
@@ -172,11 +251,12 @@
     <div class="score-ring-card">
         <svg viewBox="0 0 100 100" width="90" height="90">
             <circle cx="50" cy="50" r="45" fill="none" stroke="#1a1a2e" stroke-width="8"/>
-            <circle cx="50" cy="50" r="45" fill="none" stroke="{{ $sc_color }}" stroke-width="8"
-                stroke-dasharray="283" stroke-dashoffset="{{ $offset }}"
+            <circle class="ring-arc" cx="50" cy="50" r="45" fill="none" stroke="{{ $sc_color }}" stroke-width="8"
+                stroke-dasharray="283" stroke-dashoffset="283"
                 stroke-linecap="round" transform="rotate(-90 50 50)"
-                style="filter: drop-shadow(0 0 4px {{ $sc_color }})"/>
-            <text x="50" y="54" text-anchor="middle" fill="{{ $sc_color }}" font-size="20" font-weight="bold" font-family="monospace">{{ $sc['score'] }}</text>
+                data-final-offset="{{ $offset }}"
+                style="transition: stroke-dashoffset 0.9s cubic-bezier(0.25,0.46,0.45,0.94); filter: drop-shadow(0 0 4px {{ $sc_color }})"/>
+            <text class="ring-num" x="50" y="54" text-anchor="middle" fill="{{ $sc_color }}" font-size="20" font-weight="bold" font-family="monospace" data-target="{{ $sc['score'] }}">0</text>
         </svg>
         <div class="score-ring-label">{{ $sc['icon'] }} {{ $sc['label'] }}</div>
     </div>
@@ -275,6 +355,38 @@
 <div class="back-row">
     <a href="{{ route('reviews.index') }}" class="btn-back">← 新しいレビューを開始</a>
     <a href="{{ route('ranking') }}" class="btn-ranking">🏆 ランキング</a>
+    <button class="btn-share" id="btn-share" onclick="shareReview()">🔗 Share</button>
+</div>
+
+{{-- FOOTER --}}
+{{-- 隠しメッセージ：最後までスクロールした人だけ見える --}}
+<div class="scroll-mascot" id="scroll-mascot">
+    <img src="/images/cl-scroll.png" class="sm-img" alt="CodeLensくん">
+    <div>
+        <div class="sm-quote" id="sm-quote"></div>
+        <div class="sm-name">CodeLensくん</div>
+    </div>
+</div>
+
+<div class="review-footer">
+    <div class="rf-divider"></div>
+    <div class="rf-body">
+        <div class="rf-left">
+            <img src="/images/devinsight-logo.png" class="rf-logo" alt="logo">
+            <div>
+                <div class="rf-generated">Generated with <strong>CodeLens AI</strong> <span class="rf-version">v1.0</span></div>
+                <div class="rf-credit">Designed &amp; Developed by <strong>Mize</strong></div>
+            </div>
+        </div>
+        {{-- ③ View Creator ボタン + ⑥ Opening... 演出 --}}
+        <a href="https://github.com/mize1978" target="_blank" rel="noopener" class="rf-github-btn" id="rf-github-btn">
+            <img src="/images/devinsight-logo.png" class="rf-btn-logo" alt="logo">
+            <span class="rf-btn-inner">
+                <span class="rf-btn-title">View Creator</span>
+                <span class="rf-btn-sub">github.com/mize1978</span>
+            </span>
+        </a>
+    </div>
 </div>
 
 {{-- ===== FAILED STATE ===== --}}
@@ -293,39 +405,221 @@
 <script>
 const CSRF = "{{ csrf_token() }}";
 const FIX_URL = "{{ route('reviews.fix', $review) }}";
+const CURRENT_SCORE = {{ $review->overall_score ?? 0 }};
+const REPO_NAME = "{{ $review->repo }}";
+
+// スコアアニメーション
+(function() {
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+  function countUp(el, target, duration, isSvg) {
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const val = Math.round(easeOut(t) * target);
+      if (isSvg) el.textContent = val;
+      else el.textContent = val;
+      if (t < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // 少し遅らせてから一斉スタート
+  setTimeout(() => {
+    // 総合スコア
+    const overall = document.getElementById('score-overall');
+    if (overall) countUp(overall, parseInt(overall.dataset.target), 900, false);
+
+    // 各リングのアーク + 数字
+    document.querySelectorAll('.ring-arc').forEach(arc => {
+      const finalOffset = parseFloat(arc.dataset.finalOffset);
+      arc.style.strokeDashoffset = finalOffset;
+    });
+    document.querySelectorAll('.ring-num').forEach(num => {
+      countUp(num, parseInt(num.dataset.target), 900, true);
+    });
+  }, 200);
+})();
 
 async function fixWithAI(idx, title, desc, file) {
     const btn = document.querySelector(`#issue-${idx} .btn-fix-ai`);
     const resultDiv = document.getElementById(`fix-result-${idx}`);
 
     btn.disabled = true;
-    btn.textContent = '⏳ AIが修正中...';
     resultDiv.style.display = 'block';
-    resultDiv.innerHTML = '<div class="fix-loading">Claude が修正案を生成中...</div>';
+
+    // ③ 3段階アニメ
+    const stages = ['⚙ Generating Fix...', '🔍 Analyzing Dependencies...', '🩹 Generating Patch...'];
+    let si = 0;
+    btn.textContent = stages[0];
+    resultDiv.innerHTML = `<div class="fix-loading"><span class="fix-stage">${stages[0]}</span></div>`;
+    const stageTimer = setInterval(() => {
+        si = Math.min(si + 1, stages.length - 1);
+        btn.textContent = stages[si];
+        resultDiv.querySelector('.fix-stage').textContent = stages[si];
+    }, 1800);
 
     try {
         const res = await fetch(FIX_URL, {
             method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': CSRF,
-                'Content-Type': 'application/json',
-            },
+            headers: { 'X-CSRF-TOKEN': CSRF, 'Content-Type': 'application/json' },
             body: JSON.stringify({ issue_title: title, issue_desc: desc, file: file }),
         });
+        clearInterval(stageTimer);
         const json = await res.json();
+
         if (json.status === 'ok') {
-            resultDiv.innerHTML = `<div class="fix-output"><pre><code>${escapeHtml(json.fix)}</code></pre></div>`;
+            const patchText = json.diff || json.fix || '';
+            let html = '<div class="fix-section-gap">';
+
+            // ⑤ Diff Summary + ① Diff with line numbers
+            if (json.diff) {
+                const { adds, dels } = patchStats(json.diff);
+                html += `<div class="patch-summary">
+                    <div class="ps-title">DIFF SUMMARY</div>
+                    <div class="ps-stats">
+                        <span class="ps-adds">+${adds} addition${adds !== 1 ? 's' : ''}</span>
+                        <span class="ps-sep">|</span>
+                        <span class="ps-dels">-${dels} deletion${dels !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>`;
+                html += `<div class="diff-unified">${renderDiff(json.diff)}</div>`;
+            }
+
+            // ① BEFORE ════▶ AFTER（高さ揃え）
+            if (json.before && json.fix) {
+                html += `
+                <div class="fix-diff">
+                    <div class="diff-panel diff-before" style="align-self:stretch">
+                        <div class="diff-label">BEFORE</div>
+                        <pre style="min-height:200px"><code>${escapeHtml(json.before)}</code></pre>
+                    </div>
+                    <div class="diff-arrow">
+                        <div class="da-sym">════▶</div>
+                    </div>
+                    <div class="diff-panel diff-after" style="align-self:stretch">
+                        <div class="diff-label">AFTER</div>
+                        <pre style="min-height:200px"><code>${escapeHtml(json.fix)}</code></pre>
+                    </div>
+                </div>`;
+            } else if (json.fix) {
+                html += `<div class="fix-diff"><div class="diff-panel diff-after" style="grid-column:1/-1">
+                    <div class="diff-label">FIX</div>
+                    <pre><code>${escapeHtml(json.fix)}</code></pre>
+                </div></div>`;
+            }
+
+            // ③ AI Explanation card（タイトル発光 + divider）
+            if (json.explanation) {
+                html += `<div class="diff-explanation">
+                    <div class="expl-title">💡 WHY THIS FIX WORKS</div>
+                    <div class="expl-divider"></div>
+                    <div class="expl-body">${escapeHtml(json.explanation)}</div>
+                </div>`;
+            }
+
+            // ⑥ Score delta（縦レイアウト）
+            if (json.score_delta && CURRENT_SCORE > 0) {
+                const newScore = Math.min(100, CURRENT_SCORE + json.score_delta);
+                const delta = newScore - CURRENT_SCORE;
+                html += `<div class="score-delta-card">
+                    <div class="sd-label">📈 ESTIMATED SCORE AFTER FIX</div>
+                    <div class="sd-flow">
+                        <span class="sd-from">${CURRENT_SCORE}</span>
+                        <span class="sd-arrow-down">↓</span>
+                        <div class="sd-to-row">
+                            <span class="sd-to">${newScore}</span>
+                            <span class="sd-delta">+${delta} pts</span>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            // ④ Actions: Copy Patch | Download Diff
+            if (patchText) {
+                const safePatch = JSON.stringify(patchText);
+                html += `<div class="fix-actions">
+                    <button class="btn-copy-patch" onclick="copyPatch(this, ${safePatch})">📋 Copy Patch</button>
+                    <button class="btn-download-diff" onclick="downloadDiff(${safePatch})">⬇ Download Diff</button>
+                </div>`;
+            }
+
+            html += '</div>';
+            resultDiv.innerHTML = html;
             btn.textContent = '✅ 修正済み';
+            showMascot('/images/cl-happy.png', 'もっと良くなったね！', 2400);
         } else {
             resultDiv.innerHTML = `<div class="fix-error">エラー: ${escapeHtml(json.message || 'Unknown error')}</div>`;
             btn.disabled = false;
             btn.textContent = '✨ Fix with AI';
         }
     } catch(e) {
+        clearInterval(stageTimer);
         resultDiv.innerHTML = `<div class="fix-error">通信エラーが発生しました</div>`;
         btn.disabled = false;
         btn.textContent = '✨ Fix with AI';
     }
+}
+
+// ① diff レンダラー（GitHub-style 行番号付き）
+function renderDiff(diff) {
+    let oldLine = 1, newLine = 1;
+    return diff.split('\n').map(line => {
+        if (line.startsWith('@@')) {
+            const m = line.match(/-(\d+)(?:,\d+)? \+(\d+)/);
+            if (m) { oldLine = parseInt(m[1]); newLine = parseInt(m[2]); }
+            return `<div class="dl-hunk"><span class="dl-num">…</span><span class="dl-num">…</span><span class="dl-code">${escapeHtml(line)}</span></div>`;
+        }
+        if (line.startsWith('---') || line.startsWith('+++')) {
+            return `<div class="dl-hdr"><span class="dl-num"></span><span class="dl-num"></span><span class="dl-code">${escapeHtml(line)}</span></div>`;
+        }
+        if (line.startsWith('-')) {
+            return `<div class="dl-del"><span class="dl-num">${oldLine++}</span><span class="dl-num"></span><span class="dl-code">${escapeHtml(line)}</span></div>`;
+        }
+        if (line.startsWith('+')) {
+            return `<div class="dl-add"><span class="dl-num"></span><span class="dl-num">${newLine++}</span><span class="dl-code">${escapeHtml(line)}</span></div>`;
+        }
+        return `<div class="dl-ctx"><span class="dl-num">${oldLine++}</span><span class="dl-num">${newLine++}</span><span class="dl-code">${escapeHtml(line)}</span></div>`;
+    }).join('');
+}
+
+// ⑤ Patch サマリ統計
+function patchStats(diff) {
+    let adds = 0, dels = 0;
+    diff.split('\n').forEach(l => {
+        if (l.startsWith('+') && !l.startsWith('+++')) adds++;
+        else if (l.startsWith('-') && !l.startsWith('---')) dels++;
+    });
+    return { adds, dels };
+}
+
+// ④ Copy Patch
+function copyPatch(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => btn.textContent = orig, 2000);
+    });
+}
+
+// ④ Download Diff
+function downloadDiff(text) {
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = (REPO_NAME || 'patch') + '.diff';
+    a.click(); URL.revokeObjectURL(url);
+}
+
+// ④ Share
+function shareReview() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('btn-share');
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => btn.textContent = '🔗 Share', 2000);
+    });
 }
 
 function copyPRComment() {
@@ -346,6 +640,46 @@ function copyPRComment() {
 function escapeHtml(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// スクロール easter egg
+(function() {
+    const mascot = document.getElementById('scroll-mascot');
+    const quoteEl = document.getElementById('sm-quote');
+    if (!mascot || !quoteEl) return;
+    const quotes = [
+        'また来てくれたね。',
+        '今日もコード見つけられた！',
+        'またレビューしようね。',
+        '次はもっと高得点かも。',
+        'コードを書く人を応援してるよ。',
+    ];
+    quoteEl.textContent = '「' + quotes[Math.floor(Math.random() * quotes.length)] + '」';
+    const obs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+            mascot.classList.add('visible');
+            obs.disconnect();
+        }
+    }, { threshold: 0.6 });
+    obs.observe(mascot);
+})();
+
+// View Creator ボタン — 200ms 演出
+const rfBtn = document.getElementById('rf-github-btn');
+if (rfBtn) {
+    rfBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const titleEl = this.querySelector('.rf-btn-title');
+        const subEl   = this.querySelector('.rf-btn-sub');
+        const original = titleEl.textContent;
+        titleEl.textContent = 'Opening Creator Profile...';
+        subEl.style.opacity = '0';
+        setTimeout(() => { window.open('https://github.com/mize1978', '_blank'); }, 220);
+        setTimeout(() => {
+            titleEl.textContent = original;
+            subEl.style.opacity = '1';
+        }, 800);
+    });
+}
 </script>
 @endif
 
@@ -362,6 +696,58 @@ function escapeHtml(str) {
 .progress-bar-wrap { background: #1a1a2e; border-radius: 99px; height: 8px; overflow: hidden; }
 .progress-bar { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--blue)); border-radius: 99px; transition: width 0.4s; }
 .progress-label { color: var(--text-muted); font-size: 0.85rem; margin-top: 8px; }
+.proc-mascot { margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.proc-mascot {
+  margin-top: 16px;
+  display: flex; align-items: center; justify-content: center; gap: 2px;
+}
+.pm-main-wrap {
+  position: relative; display: inline-block;
+  width: 130px; height: 130px; flex-shrink: 0;
+  margin-bottom: -10px; /* ② 少し上へ */
+}
+.pm-main-img {
+  width: 130px; height: 130px; object-fit: contain;
+  animation: pmFloat 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 10px rgba(0,80,200,0.14));
+}
+/* ③ 楕円の足元影 */
+.pm-main-wrap::after {
+  content: '';
+  position: absolute; bottom: -4px; left: 50%;
+  transform: translateX(-50%);
+  width: 60px; height: 8px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.28) 0%, transparent 70%);
+  pointer-events: none;
+}
+.pm-glint {
+  position: absolute; top: 5%; left: -50%; width: 40%; height: 50%;
+  background: linear-gradient(110deg, transparent 20%, rgba(255,240,180,0.7) 50%, transparent 80%);
+  pointer-events: none; opacity: 0;
+}
+.pm-glint.flash { animation: pmGlint 0.6s ease-out forwards; }
+@keyframes pmGlint {
+  0%   { left: -50%; opacity: 0; }
+  15%  { opacity: 1; }
+  100% { left: 120%; opacity: 0; }
+}
+/* 95% 到達フラッシュ */
+.pm-main-img.found {
+  animation: pmFloat 3.2s ease-in-out infinite, mascotFlash 0.22s ease-out;
+}
+@keyframes mascotFlash {
+  0%   { filter: drop-shadow(0 4px 10px rgba(0,80,200,0.14)) brightness(1); }
+  45%  { filter: drop-shadow(0 0 28px rgba(140,220,255,0.95)) brightness(1.4); }
+  100% { filter: drop-shadow(0 4px 10px rgba(0,80,200,0.14)) brightness(1); }
+}
+.pm-text {
+  font-size: 0.76rem; color: var(--text-dim); font-style: italic;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px 10px 10px 2px;
+  padding: 7px 11px; white-space: nowrap;
+  margin-left: -6px;
+}
+@keyframes pmFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
 /* ① Overall Hero */
@@ -419,6 +805,119 @@ function escapeHtml(str) {
 .fix-output code { font-family: monospace; font-size: 0.82rem; color: #e6e6ff; white-space: pre-wrap; word-break: break-word; }
 .fix-error { color: #ff6680; font-size: 0.85rem; padding: 10px; }
 
+/* ─── Diff: GitHub-style ─── */
+.diff-unified {
+  border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.74rem;
+  background: #0d0d1a; line-height: 1.65;
+}
+.diff-unified > div { display: flex; align-items: stretch; min-height: 1.65em; }
+.dl-num {
+  min-width: 36px; padding: 0 8px;
+  text-align: right; color: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.025);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  user-select: none; flex-shrink: 0; font-size: 0.68rem;
+  display: flex; align-items: center; justify-content: flex-end;
+}
+.dl-code { padding: 0 10px; flex: 1; white-space: pre-wrap; word-break: break-all; display: flex; align-items: center; }
+.dl-add            { background: rgba(0,255,100,0.07); }
+.dl-add .dl-num    { color: rgba(0,255,136,0.45); background: rgba(0,255,100,0.06); }
+.dl-add .dl-code   { color: #7ef58a; }
+.dl-del            { background: rgba(255,60,80,0.09); }
+.dl-del .dl-num    { color: rgba(255,100,120,0.5); background: rgba(255,60,80,0.06); }
+.dl-del .dl-code   { color: #ff8099; }
+.dl-ctx .dl-code   { color: rgba(255,255,255,0.38); }
+.dl-hunk           { background: rgba(0,100,255,0.07); }
+.dl-hunk .dl-num   { color: transparent; }
+.dl-hunk .dl-code  { color: rgba(0,200,255,0.55); font-style: italic; }
+.dl-hdr .dl-code   { color: rgba(255,255,255,0.25); }
+
+/* ⑤ Patch summary */
+.patch-summary {
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 8px;
+}
+.ps-title { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.18em; color: rgba(255,255,255,0.3); margin-bottom: 6px; }
+.ps-stats { display: flex; gap: 12px; align-items: center; }
+.ps-adds { color: #00ff88; font-size: 0.75rem; font-weight: 700; font-family: monospace; }
+.ps-dels { color: #ff6680; font-size: 0.75rem; font-weight: 700; font-family: monospace; }
+.ps-sep  { color: rgba(255,255,255,0.12); font-size: 0.72rem; }
+
+/* ① Before ════▶ After */
+.fix-diff {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: 12px;
+}
+.diff-arrow {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: var(--cyan); font-family: monospace; font-weight: 700;
+  text-shadow: 0 0 10px rgba(0,200,255,0.9), 0 0 22px rgba(0,200,255,0.45);
+  user-select: none; flex-shrink: 0;
+}
+.da-sym { font-size: 1.05rem; letter-spacing: -2px; line-height: 1; }
+.diff-panel { border-radius: 8px; overflow: hidden; }
+.diff-before { border: 1px solid rgba(255,70,100,0.3); }
+.diff-after  { border: 1px solid rgba(0,255,136,0.3); }
+.diff-label { padding: 5px 12px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.15em; }
+.diff-before .diff-label { background: rgba(255,70,100,0.12); color: #ff6680; }
+.diff-after  .diff-label { background: rgba(0,255,136,0.1);  color: #00ff88; }
+.diff-panel pre { background: #070710; padding: 12px; margin: 0; overflow-x: auto; }
+.diff-panel code { font-family: monospace; font-size: 0.78rem; color: #ccc; white-space: pre-wrap; word-break: break-word; }
+
+/* ③ AI Explanation */
+.diff-explanation {
+  padding: 14px 16px; border-radius: 10px;
+  background: rgba(0,150,255,0.05); border: 1px solid rgba(0,150,255,0.18);
+}
+.expl-title {
+  font-size: 0.65rem; font-weight: 800; letter-spacing: 0.2em;
+  color: var(--cyan);
+  text-shadow: 0 0 10px rgba(0,200,255,0.7), 0 0 20px rgba(0,200,255,0.3);
+  margin-bottom: 8px;
+}
+.expl-divider {
+  height: 1px; background: linear-gradient(to right, rgba(0,200,255,0.3), transparent);
+  margin-bottom: 10px;
+}
+.expl-body  { font-size: 0.84rem; color: #c8c8d8; line-height: 1.7; }
+
+/* ⑥ Score delta */
+.score-delta-card {
+  padding: 14px 18px; border-radius: 10px; text-align: center;
+  background: rgba(0,255,136,0.04); border: 1px solid rgba(0,255,136,0.16);
+}
+.sd-label  {
+  font-size: 0.63rem; font-weight: 800; letter-spacing: 0.2em;
+  color: rgba(0,255,136,0.7); margin-bottom: 12px;
+}
+.sd-flow   { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.sd-from   { font-size: 2rem; font-weight: 900; font-family: monospace; color: #666; line-height: 1; }
+.sd-arrow-down { color: rgba(0,255,136,0.5); font-size: 1rem; line-height: 1; }
+.sd-to-row { display: flex; align-items: baseline; gap: 8px; }
+.sd-to     { font-size: 2rem; font-weight: 900; font-family: monospace; color: #00ff88; line-height: 1; text-shadow: 0 0 16px rgba(0,255,136,0.5); }
+.sd-delta  { font-size: 0.8rem; font-weight: 800; color: #00ff88; background: rgba(0,255,136,0.12); padding: 3px 9px; border-radius: 4px; }
+
+/* ④ Action buttons */
+.fix-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-copy-patch, .btn-download-diff {
+  flex: 1; text-align: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12); color: #ccc;
+  padding: 9px 16px; border-radius: 7px; font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.btn-copy-patch:hover    { background: rgba(0,200,255,0.12); color: var(--cyan); border-color: rgba(0,200,255,0.35); box-shadow: 0 0 12px rgba(0,200,255,0.12); }
+.btn-download-diff:hover { background: rgba(0,255,136,0.1); color: #00ff88; border-color: rgba(0,255,136,0.35); box-shadow: 0 0 12px rgba(0,255,136,0.1); }
+
+.fix-section-gap { display: flex; flex-direction: column; gap: 10px; }
+.fix-stage { animation: stagePulse 1s ease-in-out infinite; display: inline-block; }
+@keyframes stagePulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+@media (max-width: 640px) { .fix-diff { grid-template-columns: 1fr; } .diff-arrow { transform: rotate(90deg); } }
+
 /* ⑤ PR Comment */
 .pr-desc { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 14px; }
 .pr-actions { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
@@ -437,6 +936,60 @@ function escapeHtml(str) {
 .btn-back:hover { background: rgba(255,255,255,0.1); color: #fff; }
 .btn-ranking { background: rgba(255,170,0,0.1); border: 1px solid rgba(255,170,0,0.3); color: #ffaa00; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-size: 0.88rem; transition: background 0.2s; }
 .btn-ranking:hover { background: rgba(255,170,0,0.2); }
+.btn-share { background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.25); color: var(--cyan); padding: 10px 22px; border-radius: 8px; font-family: inherit; font-size: 0.88rem; cursor: pointer; transition: background 0.2s; }
+.btn-share:hover { background: rgba(0,200,255,0.15); }
+
+/* Review footer */
+/* スクロール easter egg */
+.scroll-mascot {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 24px; margin: 0 0 8px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.scroll-mascot.visible { opacity: 1; transform: translateY(0); }
+.sm-img  { width: 60px; height: 60px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35)); }
+.sm-quote { font-size: 0.82rem; color: var(--text-dim); font-style: italic; margin-bottom: 4px; }
+.sm-name  { font-size: 0.56rem; color: var(--text-mute); letter-spacing: 0.12em; }
+
+.review-footer { margin-top: 56px; }
+.rf-divider {
+  height: 1px; margin-bottom: 36px;
+  background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
+}
+.rf-body {
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 32px; line-height: 1;
+}
+.rf-left { display: flex; align-items: center; gap: 14px; }
+.rf-logo { width: 32px; height: 32px; border-radius: 8px; opacity: 0.65; }
+.rf-generated { font-size: 0.8rem; color: var(--text-mute); margin-bottom: 4px; }
+.rf-generated strong { color: var(--text-dim); font-weight: 600; }
+.rf-credit { font-size: 0.7rem; color: var(--text-mute); }
+.rf-credit strong { color: var(--text-dim); font-weight: 600; }
+.rf-github-btn {
+  display: inline-flex; align-items: center; gap: 11px;
+  padding: 13px 20px; border-radius: 10px;
+  border: 1px solid var(--border); color: var(--text-dim);
+  text-decoration: none; transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.rf-github-btn:hover {
+  border-color: rgba(0,200,255,0.4); color: var(--cyan);
+  background: rgba(0,200,255,0.05);
+}
+.rf-btn-logo {
+  width: 30px; height: 30px; border-radius: 7px;
+  opacity: 0.75; flex-shrink: 0; transition: opacity 0.2s;
+}
+.rf-github-btn:hover .rf-btn-logo { opacity: 1; }
+.rf-btn-inner { display: flex; flex-direction: column; gap: 4px; }
+.rf-btn-title { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; }
+.rf-btn-sub { font-size: 0.62rem; color: rgba(140,180,220,0.35); letter-spacing: 0.02em; transition: color 0.2s; }
+.rf-github-btn:hover .rf-btn-sub { color: rgba(0,200,255,0.5); }
+.rf-version {
+  font-size: 0.62rem; color: var(--text-mute);
+  font-weight: 400; letter-spacing: 0.05em;
+}
 
 @media (max-width: 600px) {
     .overall-inner { flex-direction: column; text-align: center; gap: 16px; }

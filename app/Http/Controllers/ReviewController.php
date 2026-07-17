@@ -115,7 +115,14 @@ class ReviewController extends Controller
             }
 
             $fixed = $claude->fixIssue($request->issue_title, $request->issue_desc, $files);
-            return response()->json(['status' => 'ok', 'fix' => $fixed]);
+            return response()->json([
+                'status'      => 'ok',
+                'before'      => $fixed['before'] ?? null,
+                'fix'         => $fixed['after']  ?? $fixed['fix'] ?? '',
+                'diff'        => $fixed['diff']   ?? null,
+                'score_delta' => $fixed['score_delta'] ?? null,
+                'explanation' => $fixed['explanation'] ?? null,
+            ]);
 
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
