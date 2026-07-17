@@ -117,15 +117,15 @@
     <div class="lib-shelf-wrap">
       <div class="library-shelf">
 
-        <a class="lib-book" href="#" target="_blank" rel="noopener">
-          <img src="/images/library/book-codelens.png" alt="CodeLens" class="lib-book-img">
+        <a class="lib-book" href="https://notion.so/3a0d9f65223b81c5acaff8a6a09cf9c0" target="_blank" rel="noopener">
+          <img src="/images/library/book-codelens.png" alt="Development Journal" class="lib-book-img">
           <div class="lib-book-label">
-            <span class="lib-book-name">CodeLens</span>
+            <span class="lib-book-name">Dev Journal</span>
             <span class="lib-book-open">Open →</span>
           </div>
         </a>
 
-        <a class="lib-book" href="#" target="_blank" rel="noopener">
+        <a class="lib-book" href="https://notion.so/3a0d9f65223b8106b430db5dea35edec" target="_blank" rel="noopener">
           <img src="/images/library/book-design-bible.png" alt="Design Bible" class="lib-book-img">
           <div class="lib-book-label">
             <span class="lib-book-name">Design Bible</span>
@@ -133,7 +133,7 @@
           </div>
         </a>
 
-        <a class="lib-book" href="#" target="_blank" rel="noopener">
+        <a class="lib-book" href="https://notion.so/3a0d9f65223b811790cafc6cfbd8fc2f" target="_blank" rel="noopener">
           <img src="/images/library/book-knowledge.png" alt="Knowledge" class="lib-book-img">
           <div class="lib-book-label">
             <span class="lib-book-name">Knowledge</span>
@@ -141,7 +141,7 @@
           </div>
         </a>
 
-        <a class="lib-book" href="#" target="_blank" rel="noopener">
+        <a class="lib-book" href="https://notion.so/3a0d9f65223b819eaefbcb98e01ac80e" target="_blank" rel="noopener">
           <img src="/images/library/book-projects.png" alt="Projects" class="lib-book-img">
           <div class="lib-book-label">
             <span class="lib-book-name">Projects</span>
@@ -149,7 +149,7 @@
           </div>
         </a>
 
-        <a class="lib-book" href="#" target="_blank" rel="noopener">
+        <a class="lib-book" href="https://notion.so/3a0d9f65223b81a4b1f9c34fac0edf84" target="_blank" rel="noopener">
           <img src="/images/library/book-ideas.png" alt="Ideas" class="lib-book-img">
           <div class="lib-book-label">
             <span class="lib-book-name">Ideas</span>
