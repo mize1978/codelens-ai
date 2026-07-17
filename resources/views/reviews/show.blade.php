@@ -363,14 +363,9 @@
     <button class="btn-share" id="btn-share" onclick="shareReview()">🔗 Share</button>
 </div>
 
-{{-- FOOTER --}}
-{{-- 隠しメッセージ：最後までスクロールした人だけ見える --}}
-<div class="scroll-mascot" id="scroll-mascot">
-    <img src="/images/cl-scroll.png" class="sm-img" alt="CodeLensくん">
-    <div>
-        <div class="sm-quote" id="sm-quote"></div>
-        <div class="sm-name">CodeLensくん</div>
-    </div>
+{{-- FOOTER — CodeLensくん Ending Animation --}}
+<div id="scroll-mascot">
+    @include('components.codelens-ending')
 </div>
 
 <div class="review-footer">
@@ -646,25 +641,16 @@ function escapeHtml(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// スクロール easter egg
+// Ending animation scroll reveal
 (function() {
     const mascot = document.getElementById('scroll-mascot');
-    const quoteEl = document.getElementById('sm-quote');
-    if (!mascot || !quoteEl) return;
-    const quotes = [
-        'また来てくれたね。',
-        '今日もコード見つけられた！',
-        'またレビューしようね。',
-        '次はもっと高得点かも。',
-        'コードを書く人を応援してるよ。',
-    ];
-    quoteEl.textContent = '「' + quotes[Math.floor(Math.random() * quotes.length)] + '」';
-    const obs = new IntersectionObserver(entries => {
+    if (!mascot) return;
+    const obs = new IntersectionObserver(function(entries) {
         if (entries[0].isIntersecting) {
             mascot.classList.add('visible');
             obs.disconnect();
         }
-    }, { threshold: 0.6 });
+    }, { threshold: 0.25 });
     obs.observe(mascot);
 })();
 
@@ -945,17 +931,14 @@ if (rfBtn) {
 .btn-share:hover { background: rgba(0,200,255,0.15); }
 
 /* Review footer */
-/* スクロール easter egg */
-.scroll-mascot {
-  display: flex; align-items: center; gap: 14px;
-  padding: 18px 24px; margin: 0 0 8px;
-  opacity: 0; transform: translateY(10px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+/* Ending animation scroll reveal */
+#scroll-mascot {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+  margin: 56px 0 32px;
 }
-.scroll-mascot.visible { opacity: 1; transform: translateY(0); }
-.sm-img  { width: 60px; height: 60px; object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35)); }
-.sm-quote { font-size: 0.82rem; color: var(--text-dim); font-style: italic; margin-bottom: 4px; }
-.sm-name  { font-size: 0.56rem; color: var(--text-mute); letter-spacing: 0.12em; }
+#scroll-mascot.visible { opacity: 1; transform: translateY(0); }
 
 .review-footer { margin-top: 56px; }
 .rf-divider {
