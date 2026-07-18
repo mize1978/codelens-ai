@@ -65,7 +65,7 @@ saved to your Library (Dev Journal), allowing you to build a personal knowledge 
 </tr></table>
 
 **📚 CodeLens Library (Dev Journal)**
-*Every project has its own story.*
+*Save every review as a collectible book and build your personal knowledge base.*
 
 <p align="center">
   <img src="docs/images/library.jpg" alt="Library" width="820">
