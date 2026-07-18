@@ -318,6 +318,7 @@
         <li>{{ $s }}</li>
         @endforeach
     </ul>
+    <p class="review-closing-message">作り切ることが第一歩。改善を続けることがエンジニアリング。</p>
 </div>
 @endif
 
@@ -841,6 +842,7 @@ if (rfBtn) {
 .summary-text { color: #ccc; line-height: 1.7; margin: 0; }
 .bullet-list { margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8; }
 .security-list li { color: #ffaa88; }
+.review-closing-message { margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--border); color: #7a9bb5; font-size: 0.82rem; text-align: left; letter-spacing: 0.3px; }
 
 /* ③ Issues */
 .issues-list { display: flex; flex-direction: column; gap: 14px; }
