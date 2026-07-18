@@ -1,6 +1,6 @@
 # CodeLensAI
 
-> AI-powered code review that turns feedback into a learning experience.
+> AI-powered code review for continuous learning.
 
 Analyze GitHub repositories with AI, receive actionable feedback,
 and continuously improve your code quality through an intuitive review experience.
@@ -15,11 +15,11 @@ and continuously improve your code quality through an intuitive review experienc
 
 ![AI Review](docs/images/review.gif)
 
-> Watch CodeLensAI analyze a GitHub repository and suggest improvements in real time.
+> Watch CodeLensAI analyze a GitHub repository, detect issues, and generate AI-powered improvements in real time.
 
 ---
 
-## 📸 Screenshots
+## 📸 Key Screens
 
 | Dashboard | AI Review |
 |-----------|-----------|
