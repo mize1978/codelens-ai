@@ -65,15 +65,13 @@ saved to your Library (Dev Journal), allowing you to build a personal knowledge 
   <img src="docs/images/library.jpg" alt="Library" width="820">
 </p>
 
-**AI Fix Suggestions** — BEFORE / AFTER diffs with "Why this fix works" explanations
-
 <p align="center">
-  <img src="docs/images/fix.jpg" alt="AI Fix Suggestions" width="820">
+  <img src="docs/images/review.jpg" alt="AI Review" width="48%">
+  <img src="docs/images/fix.jpg" alt="AI Fix Suggestions" width="48%">
 </p>
 
 <p align="center">
-  <img src="docs/images/review.jpg" alt="AI Review" width="48%">
-  <img src="docs/images/ranking.jpg" alt="Ranking" width="48%">
+  <img src="docs/images/ranking.jpg" alt="Ranking" width="820">
 </p>
 
 ---
