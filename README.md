@@ -61,7 +61,7 @@ Paste a GitHub repository URL and start an AI review.
 </p>
 
 <table align="center"><tr>
-<td align="center" width="50%"><b>🤖 AI Review</b><br>Get an overall quality score, issue breakdown, and actionable feedback.<br><br><img src="docs/images/review.jpg" alt="AI Review" width="100%"></td>
+<td align="center" width="50%"><b>🤖 AI Review</b><br>Get an overall quality score,<br>issue breakdown,<br>and actionable feedback.<br><br><img src="docs/images/review.jpg" alt="AI Review" width="100%"></td>
 <td align="center" width="50%"><b>🔧 AI Fix Suggestions</b><br>Review before/after diffs, understand why each fix works, and see your estimated score improve.<br><br><img src="docs/images/fix.jpg" alt="AI Fix Suggestions" width="100%"></td>
 </tr></table>
 
