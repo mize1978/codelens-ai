@@ -30,7 +30,7 @@ and continuously improve your code quality through an intuitive review experienc
 - **Learning Mode** — Reviews written to teach, not just critique
 - **Rankings** — Gamified progress tracking across your repositories
 - **Library** — Save and revisit your best learnings
-- **CodeLensくん** — Your AI review companion
+- **🤖 Meet CodeLens-kun** — Your AI learning companion.
 - **Notion Integration** — Sync insights directly to your workspace
 
 ---
