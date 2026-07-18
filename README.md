@@ -53,22 +53,27 @@ saved to your Library (Dev Journal), allowing you to build a personal knowledge 
 
 ## 🖼️ Screenshots
 
-**Dashboard** — paste a GitHub repo URL and let the AI review it
+**📸 Dashboard**
+Paste a GitHub repository URL and start an AI review.
 
 <p align="center">
   <img src="docs/images/dashboard.jpg" alt="Dashboard" width="820">
 </p>
 
-**CodeLens Library (Dev Journal)** — every project has its own story
+<table align="center"><tr>
+<td align="center" width="50%"><b>🤖 AI Review</b><br>Get an overall quality score, issue breakdown, and actionable feedback.<br><br><img src="docs/images/review.jpg" alt="AI Review" width="100%"></td>
+<td align="center" width="50%"><b>🔧 AI Fix Suggestions</b><br>Review before/after diffs, understand why each fix works, and see your estimated score improve.<br><br><img src="docs/images/fix.jpg" alt="AI Fix Suggestions" width="100%"></td>
+</tr></table>
+
+**📚 CodeLens Library (Dev Journal)**
+Every project has its own story.
 
 <p align="center">
   <img src="docs/images/library.jpg" alt="Library" width="820">
 </p>
 
-<p align="center">
-  <img src="docs/images/review.jpg" alt="AI Review" width="48%">
-  <img src="docs/images/fix.jpg" alt="AI Fix Suggestions" width="48%">
-</p>
+**🏆 Ranking**
+Compare reviewed repositories on the leaderboard.
 
 <p align="center">
   <img src="docs/images/ranking.jpg" alt="Ranking" width="820">
