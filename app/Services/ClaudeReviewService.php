@@ -102,7 +102,7 @@ PROMPT;
             'content-type'      => 'application/json',
         ])->timeout(120)->post($this->endpoint, [
             'model'      => $this->model,
-            'max_tokens' => 2048,
+            'max_tokens' => 16384,
             'messages'   => [['role' => 'user', 'content' => $prompt]],
         ]);
 
