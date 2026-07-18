@@ -17,6 +17,8 @@ services:
         value: pgsql
       - key: DB_URL
         sync: false
+      - key: DB_PREFIX
+        value: cl_
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
