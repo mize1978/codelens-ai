@@ -442,7 +442,77 @@ const REPO_NAME = "{{ $review->repo }}";
   }, 200);
 })();
 
+// ===== Web Audio サウンドエンジン =====
+const CodeLensSounds = (() => {
+    let ctx = null;
+    function getCtx() {
+        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+        return ctx;
+    }
+    return {
+        // ピッ: Fix with AI 押下時
+        pip() {
+            const c = getCtx();
+            const osc = c.createOscillator(), g = c.createGain();
+            osc.connect(g); g.connect(c.destination);
+            osc.frequency.setValueAtTime(880, c.currentTime);
+            g.gain.setValueAtTime(0.18, c.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.08);
+            osc.start(); osc.stop(c.currentTime + 0.08);
+        },
+        // コッ: Critical 検出時
+        knock() {
+            const c = getCtx();
+            const osc = c.createOscillator(), g = c.createGain();
+            osc.connect(g); g.connect(c.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(200, c.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, c.currentTime + 0.1);
+            g.gain.setValueAtTime(0.25, c.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.1);
+            osc.start(); osc.stop(c.currentTime + 0.1);
+        },
+        // シュッ: Before→After 表示時
+        swipe() {
+            const c = getCtx();
+            const osc = c.createOscillator(), g = c.createGain();
+            osc.connect(g); g.connect(c.destination);
+            osc.frequency.setValueAtTime(1200, c.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, c.currentTime + 0.15);
+            g.gain.setValueAtTime(0.12, c.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.15);
+            osc.start(); osc.stop(c.currentTime + 0.15);
+        },
+        // ティン♪: Estimated Score 表示時
+        ting() {
+            const c = getCtx();
+            [1320, 2640, 3960].forEach((freq, i) => {
+                const osc = c.createOscillator(), g = c.createGain();
+                osc.connect(g); g.connect(c.destination);
+                osc.frequency.setValueAtTime(freq, c.currentTime);
+                g.gain.setValueAtTime([0.15, 0.06, 0.02][i], c.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.2);
+                osc.start(); osc.stop(c.currentTime + 0.2);
+            });
+        },
+    };
+})();
+
+// Critical 検出音 — 最初のユーザー操作で発火（AudioContext制約回避）
+(function() {
+    if (!document.querySelector('.sev-critical')) return;
+    const handler = () => {
+        CodeLensSounds.knock();
+        document.removeEventListener('click', handler);
+        document.removeEventListener('keydown', handler);
+    };
+    document.addEventListener('click', handler, { once: true });
+    document.addEventListener('keydown', handler, { once: true });
+})();
+
 async function fixWithAI(idx, title, desc, file) {
+    CodeLensSounds.pip();
     const btn = document.querySelector(`#issue-${idx} .btn-fix-ai`);
     const resultDiv = document.getElementById(`fix-result-${idx}`);
 
@@ -489,6 +559,7 @@ async function fixWithAI(idx, title, desc, file) {
 
             // ① BEFORE ════▶ AFTER（高さ揃え）
             if (json.before && json.fix) {
+                CodeLensSounds.swipe();
                 html += `
                 <div class="fix-diff">
                     <div class="diff-panel diff-before" style="align-self:stretch">
@@ -521,6 +592,7 @@ async function fixWithAI(idx, title, desc, file) {
 
             // ⑥ Score delta（縦レイアウト）
             if (json.score_delta && CURRENT_SCORE > 0) {
+                CodeLensSounds.ting();
                 const newScore = Math.min(100, CURRENT_SCORE + json.score_delta);
                 const delta = newScore - CURRENT_SCORE;
                 html += `<div class="score-delta-card">
