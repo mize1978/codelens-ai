@@ -1,7 +1,6 @@
 <p align="center">
   <img src="docs/images/hero.png" alt="CodeLensAI" width="820">
 </p>
-<h1 align="center">CodeLensAI</h1>
 <p align="center">
   <b>AI-powered code review that turns feedback into a learning experience.</b>
 </p>
@@ -54,26 +53,26 @@ saved to your Library (Dev Journal), allowing you to build a personal knowledge 
 ## 🖼️ Screenshots
 
 **📸 Dashboard**
-Paste a GitHub repository URL and start an AI review.
+*Paste a GitHub repository URL and start an AI review.*
 
 <p align="center">
   <img src="docs/images/dashboard.jpg" alt="Dashboard" width="820">
 </p>
 
 <table align="center"><tr>
-<td align="center" width="50%"><b>🤖 AI Review</b><br>Get an overall quality score,<br>issue breakdown,<br>and actionable feedback.<br><br><img src="docs/images/review.jpg" alt="AI Review" width="100%"></td>
-<td align="center" width="50%"><b>🔧 AI Fix Suggestions</b><br>Review before/after diffs, understand why each fix works, and see your estimated score improve.<br><br><img src="docs/images/fix.jpg" alt="AI Fix Suggestions" width="100%"></td>
+<td align="center" width="50%"><b>🤖 AI Review</b><br><i>Get an overall quality score,<br>issue breakdown,<br>and actionable feedback.</i><br><br><img src="docs/images/review.jpg" alt="AI Review" width="100%"></td>
+<td align="center" width="50%"><b>🔧 AI Fix Suggestions</b><br><i>Review before/after diffs,<br>understand why each fix works,<br>and see your estimated score improve.</i><br><br><img src="docs/images/fix.jpg" alt="AI Fix Suggestions" width="100%"></td>
 </tr></table>
 
 **📚 CodeLens Library (Dev Journal)**
-Every project has its own story.
+*Every project has its own story.*
 
 <p align="center">
   <img src="docs/images/library.jpg" alt="Library" width="820">
 </p>
 
 **🏆 Ranking**
-Compare reviewed repositories on the leaderboard.
+*Compare reviewed repositories on the leaderboard.*
 
 <p align="center">
   <img src="docs/images/ranking.jpg" alt="Ranking" width="820">
