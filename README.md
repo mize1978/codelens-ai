@@ -72,7 +72,7 @@ saved to your Library (Dev Journal), allowing you to build a personal knowledge 
 </p>
 
 **🏆 Ranking**
-*Compare reviewed repositories on the leaderboard.*
+*Compare repositories, discover rising projects, and climb to the Hall of Fame.*
 
 <p align="center">
   <img src="docs/images/ranking.jpg" alt="Ranking" width="820">

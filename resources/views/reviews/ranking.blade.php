@@ -127,8 +127,9 @@
   border-radius: 50%;
 }
 #ranking-crown {
-  width: 88px; height: 88px; object-fit: contain; display: block;
-  opacity: 0.5;
+  width: 160px; height: 160px; object-fit: contain; display: block;
+  margin-bottom: -16px;
+  opacity: 0.85;
   filter: drop-shadow(0 0 10px rgba(120,90,255,0.3));
   transition: opacity 0.35s, transform 0.35s;
 }
