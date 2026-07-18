@@ -1,0 +1,57 @@
+services:
+  - type: web
+    name: codelens-ai
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        value: https://codelens-ai.onrender.com
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: codelens-ai-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: codelens-ai-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: codelens-ai-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: codelens-ai-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: codelens-ai-db
+          property: password
+      - key: SESSION_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+
+databases:
+  - name: codelens-ai-db
+    plan: free
+    databaseName: codelens_ai
+    user: codelens
