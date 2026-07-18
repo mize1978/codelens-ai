@@ -11,6 +11,19 @@ and continuously improve your code quality through an intuitive review experienc
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/images/dashboard.png" alt="Dashboard" width="48%">
+  <img src="docs/images/review.png" alt="Review Result" width="48%">
+</p>
+<p align="center">
+  <img src="docs/images/ranking.png" alt="Ranking" width="48%">
+  <img src="docs/images/library.png" alt="Library" width="48%">
+</p>
+
+---
+
 ## Features
 
 - **AI Code Review** — Instant analysis powered by Claude (Anthropic)
@@ -23,6 +36,12 @@ and continuously improve your code quality through an intuitive review experienc
 ---
 
 ## Demo
+
+### AI Review
+
+![AI Review](docs/images/review.gif)
+
+### Live Demo
 
 > Coming soon
 
