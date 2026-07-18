@@ -11,20 +11,27 @@ and continuously improve your code quality through an intuitive review experienc
 
 ---
 
-## Screenshots
+## 🎬 Demo
 
-<p align="center">
-  <img src="docs/images/dashboard.jpg" alt="Dashboard" width="48%">
-  <img src="docs/images/review.jpg" alt="Review Result" width="48%">
-</p>
-<p align="center">
-  <img src="docs/images/ranking.jpg" alt="Ranking" width="48%">
-  <img src="docs/images/library.jpg" alt="Library" width="48%">
-</p>
+![AI Review](docs/images/review.gif)
+
+> Watch CodeLensAI analyze a GitHub repository and suggest improvements in real time.
 
 ---
 
-## Features
+## 📸 Screenshots
+
+| Dashboard | AI Review |
+|-----------|-----------|
+| ![Dashboard](docs/images/dashboard.jpg) | ![AI Review](docs/images/review.jpg) |
+
+| Ranking | Library |
+|---------|---------|
+| ![Ranking](docs/images/ranking.jpg) | ![Library](docs/images/library.jpg) |
+
+---
+
+## ✨ Features
 
 - **AI Code Review** — Instant analysis powered by Claude (Anthropic)
 - **Learning Mode** — Reviews written to teach, not just critique
@@ -35,19 +42,7 @@ and continuously improve your code quality through an intuitive review experienc
 
 ---
 
-## Demo
-
-### AI Review
-
-![AI Review](docs/images/review.gif)
-
-### Live Demo
-
-> Coming soon
-
----
-
-## Getting Started
+## 🚀 Getting Started
 
 ```bash
 git clone https://github.com/mize1978/codelens-ai.git
@@ -68,7 +63,7 @@ Open [http://localhost:8000](http://localhost:8000)
 
 ---
 
-## Tech Stack
+## 🛠 Tech Stack
 
 | Layer    | Tech                        |
 |----------|-----------------------------|
@@ -81,7 +76,7 @@ Open [http://localhost:8000](http://localhost:8000)
 
 ---
 
-## Roadmap
+## 🛣️ Roadmap
 
 | Phase  | Items                                              |
 |--------|----------------------------------------------------|
@@ -91,6 +86,6 @@ Open [http://localhost:8000](http://localhost:8000)
 
 ---
 
-## License
+## 📄 License
 
 MIT
