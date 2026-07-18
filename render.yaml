@@ -15,26 +15,8 @@ services:
         value: https://codelens-ai.onrender.com
       - key: DB_CONNECTION
         value: pgsql
-      - key: DB_HOST
-        fromDatabase:
-          name: codelens-ai-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: codelens-ai-db
-          property: port
-      - key: DB_DATABASE
-        fromDatabase:
-          name: codelens-ai-db
-          property: database
-      - key: DB_USERNAME
-        fromDatabase:
-          name: codelens-ai-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: codelens-ai-db
-          property: password
+      - key: DB_URL
+        sync: false
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
@@ -49,9 +31,3 @@ services:
         sync: false
       - key: GITHUB_TOKEN
         sync: false
-
-databases:
-  - name: codelens-ai-db
-    plan: free
-    databaseName: codelens_ai
-    user: codelens
