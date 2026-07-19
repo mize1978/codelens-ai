@@ -145,7 +145,8 @@ PROMPT;
         $this->lastLatency = round(microtime(true) - $t0, 2);
 
         if (!$response->successful()) {
-            throw new \RuntimeException('Claude API error: ' . $response->status());
+            $detail = $response->json('error.message', $response->body());
+            throw new \RuntimeException('Claude API error: ' . $response->status() . ' - ' . mb_substr($detail, 0, 300));
         }
 
         return $response->json('content.0.text', '');
