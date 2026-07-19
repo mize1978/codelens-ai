@@ -181,6 +181,12 @@
     $overall = $review->overall_score;
     $label   = $review->score_label;
     $color   = $review->score_color;
+    $sublabel = match(true) {
+        $overall >= 80 => '最高レベルのコード品質',
+        $overall >= 60 => '改善余地があります',
+        $overall >= 40 => 'いくつかの問題があります',
+        default        => '大幅な改善が必要です',
+    };
 
     $severityMeta = [
         'critical'   => ['emoji' => '🟥', 'label' => 'Critical',    'cls' => 'sev-critical'],
@@ -222,6 +228,7 @@
         <div class="overall-number" id="score-overall" data-target="{{ $overall }}">0</div>
         <div class="overall-meta">
             <div class="overall-label">{{ $label }}</div>
+            <div class="overall-sublabel">{{ $sublabel }}</div>
             <div class="overall-repo">{{ $review->owner }}/{{ $review->repo }}</div>
             <div class="overall-verdict">{{ $data['one_line_verdict'] ?? '' }}</div>
         </div>
@@ -847,7 +854,8 @@ if (rfBtn) {
 .overall-inner { display: flex; align-items: center; gap: 32px; }
 .overall-number { font-size: 5rem; font-weight: 900; font-family: monospace; color: var(--score-color, #4488ff); text-shadow: 0 0 30px var(--score-color, #4488ff); line-height: 1; min-width: 140px; }
 .overall-label { font-size: 1.6rem; font-weight: 700; color: var(--score-color, #4488ff); letter-spacing: 3px; text-transform: uppercase; }
-.overall-repo { font-family: monospace; color: var(--text-muted); font-size: 1rem; margin-top: 4px; }
+.overall-sublabel { font-size: 0.75rem; color: rgba(255,255,255,0.38); letter-spacing: 0.08em; margin-top: 3px; }
+.overall-repo { font-family: monospace; color: var(--text-muted); font-size: 1rem; margin-top: 6px; }
 .overall-verdict { color: #ccc; font-style: italic; margin-top: 8px; font-size: 0.95rem; }
 
 /* ② GitHub Stats */
