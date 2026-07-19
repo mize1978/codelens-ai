@@ -7,6 +7,7 @@ use App\Models\Review;
 use App\Services\GitHubService;
 use App\Services\ClaudeReviewService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 
 class ReviewController extends Controller
 {
@@ -67,10 +68,16 @@ class ReviewController extends Controller
 
     public function fix(Request $request, Review $review)
     {
+        $key = 'fix:' . hash('sha256', $request->ip());
+        if (RateLimiter::tooManyAttempts($key, 20)) {
+            return response()->json(['status' => 'error', 'message' => '1日の修正提案上限（20回）に達しました。'], 429);
+        }
+        RateLimiter::hit($key, 86400);
+
         $request->validate([
-            'issue_title' => 'required|string',
-            'issue_desc'  => 'required|string',
-            'file'        => 'nullable|string',
+            'issue_title' => 'required|string|max:200',
+            'issue_desc'  => 'required|string|max:1000',
+            'file'        => 'nullable|string|max:255',
         ]);
 
         try {

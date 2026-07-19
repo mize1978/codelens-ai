@@ -66,7 +66,9 @@ class GitHubService
     {
         $data = $this->get("/repos/{$owner}/{$repo}/contents/{$path}");
         if (!isset($data['content'])) return '';
-        return base64_decode(str_replace("\n", '', $data['content']));
+        if (($data['size'] ?? 0) > 1_000_000) return '';
+        $decoded = base64_decode(str_replace("\n", '', $data['content']), strict: true);
+        return $decoded === false ? '' : $decoded;
     }
 
     public function selectKeyFiles(array $tree): array
