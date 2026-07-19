@@ -256,6 +256,28 @@
 </div>
 @endif
 
+{{-- COVERAGE BADGE --}}
+@php
+    $analyzedCount = count($data['analyzed_files'] ?? []);
+    $totalCount    = $data['total_file_count'] ?? 0;
+    $coveragePct   = $totalCount > 0 ? round($analyzedCount / $totalCount * 100) : null;
+    $coverageColor = $coveragePct === null ? '#888' : ($coveragePct >= 70 ? '#00cc77' : ($coveragePct >= 40 ? '#ffaa00' : '#ff6644'));
+    $coverageLabel = $coveragePct === null ? '—' : ($coveragePct >= 70 ? '高い信頼度' : ($coveragePct >= 40 ? '参考程度' : '限定的な解析'));
+@endphp
+@if($analyzedCount > 0)
+<div class="coverage-bar" style="--cov-color: {{ $coverageColor }}">
+    <span class="cov-icon">📁</span>
+    <span class="cov-files">{{ $analyzedCount }}
+        @if($totalCount > 0) / {{ $totalCount }} @endif
+        files analyzed
+    </span>
+    @if($coveragePct !== null)
+    <span class="cov-pct">{{ $coveragePct }}%</span>
+    <span class="cov-label">{{ $coverageLabel }}</span>
+    @endif
+</div>
+@endif
+
 {{-- INDIVIDUAL SCORES --}}
 <div class="scores-row">
     @foreach([
@@ -871,7 +893,12 @@ if (rfBtn) {
 .overall-verdict { color: #ccc; font-style: italic; margin-top: 8px; font-size: 0.95rem; }
 
 /* ② GitHub Stats */
-.github-stats-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; }
+.github-stats-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; margin-bottom: 12px; }
+.coverage-bar { display: flex; align-items: center; gap: 10px; padding: 9px 16px; margin-bottom: 20px; border-radius: 10px; background: color-mix(in srgb, var(--cov-color) 6%, transparent); border: 1px solid color-mix(in srgb, var(--cov-color) 28%, transparent); }
+.cov-icon { font-size: 0.85rem; }
+.cov-files { font-size: 0.78rem; color: rgba(255,255,255,0.55); font-family: monospace; }
+.cov-pct { font-size: 0.80rem; font-weight: 700; color: var(--cov-color); margin-left: 4px; }
+.cov-label { font-size: 0.72rem; color: color-mix(in srgb, var(--cov-color) 70%, rgba(255,255,255,0.4)); letter-spacing: 0.04em; }
 .gs-item { display: flex; align-items: center; gap: 5px; font-size: 0.9rem; }
 .gs-icon { font-size: 1rem; }
 .gs-val { font-weight: 700; color: #fff; font-family: monospace; }

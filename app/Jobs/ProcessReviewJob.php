@@ -45,8 +45,10 @@ class ProcessReviewJob implements ShouldQueue
             $data = $claude->review($review->owner, $review->repo, $files);
 
             $review->update(['progress_step' => 'generating_report']);
-            $data['github_stats']    = $stats;
-            $data['analyzed_files']  = array_keys($files);
+            $data['github_stats']      = $stats;
+            $data['analyzed_files']    = array_keys($files);
+            $data['total_file_count']  = count($tree);
+            $data['selected_file_count'] = count($paths);
 
             $review->update([
                 'status'                => 'complete',
