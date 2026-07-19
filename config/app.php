@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'daily_review_limit' => env('DAILY_REVIEW_LIMIT', 10),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
