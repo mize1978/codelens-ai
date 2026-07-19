@@ -290,6 +290,18 @@
 </div>
 @endif
 
+{{-- ② TOP PRIORITIES --}}
+@if(!empty($data['top_priorities']))
+<div class="section-card priorities-card">
+    <div class="section-title">🎯 今すぐ直すべき3点</div>
+    <ol class="priorities-list">
+        @foreach($data['top_priorities'] as $p)
+        <li>{{ $p }}</li>
+        @endforeach
+    </ol>
+</div>
+@endif
+
 {{-- ③ ISSUES with severity --}}
 @if(!empty($issues))
 <div class="section-card">
@@ -877,6 +889,11 @@ if (rfBtn) {
 .section-title { font-size: 1rem; font-weight: 700; color: var(--cyan); margin-bottom: 16px; letter-spacing: 0.5px; }
 .summary-text { color: #ccc; line-height: 1.7; margin: 0; }
 .bullet-list { margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8; }
+.priorities-card { border-color: rgba(255,170,0,0.30); background: rgba(255,140,0,0.04); }
+.priorities-list { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.priorities-list li { display: flex; align-items: flex-start; gap: 12px; color: rgba(255,255,255,0.82); font-size: 0.88rem; line-height: 1.6; padding: 10px 14px; background: rgba(255,140,0,0.06); border: 1px solid rgba(255,140,0,0.14); border-radius: 8px; counter-increment: priority; }
+.priorities-list li::before { content: counter(priority); counter-reset: none; flex-shrink: 0; width: 22px; height: 22px; background: rgba(255,170,0,0.18); border: 1px solid rgba(255,170,0,0.40); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: rgba(255,200,80,0.90); line-height: 1; padding-top: 1px; }
+.priorities-list { counter-reset: priority; }
 .security-list li { color: #ffaa88; }
 .review-closing-message { margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--border); color: #7a9bb5; font-size: 0.82rem; text-align: left; letter-spacing: 0.3px; }
 
