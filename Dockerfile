@@ -25,9 +25,6 @@ RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8000
 
-CMD php artisan migrate --force && \
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php artisan queue:work --sleep=3 --tries=1 --timeout=300 & \
-    php artisan serve --host=0.0.0.0 --port="${PORT:-8000}"
+COPY docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+CMD ["/entrypoint.sh"]
