@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\RateLimiter;
 
 class ReviewController extends Controller
 {
+    public function __construct(
+        private GitHubService $github,
+        private ClaudeReviewService $claude,
+    ) {}
+
     public function index()
     {
         $popular = Review::where('status', 'complete')
@@ -32,9 +37,8 @@ class ReviewController extends Controller
                 ->withInput();
         }
 
-        $github = new GitHubService();
         try {
-            ['owner' => $owner, 'repo' => $repo] = $github->parseUrl($request->github_url);
+            ['owner' => $owner, 'repo' => $repo] = $this->github->parseUrl($request->github_url);
         } catch (\InvalidArgumentException $e) {
             return back()->withErrors(['github_url' => '有効なGitHub URLを入力してください'])->withInput();
         }
@@ -72,7 +76,7 @@ class ReviewController extends Controller
         if (RateLimiter::tooManyAttempts($key, 20)) {
             return response()->json(['status' => 'error', 'message' => '1日の修正提案上限（20回）に達しました。'], 429);
         }
-        RateLimiter::hit($key, 86400);
+        RateLimiter::hit($key, today()->secondsUntilEndOfDay());
 
         $request->validate([
             'issue_title' => 'required|string|max:200',
@@ -81,18 +85,15 @@ class ReviewController extends Controller
         ]);
 
         try {
-            $github = new GitHubService();
-            $claude = new ClaudeReviewService();
-
             $files = [];
             if ($request->file && $review->review_data) {
                 try {
-                    $content = $github->getFileContent($review->owner, $review->repo, $request->file);
+                    $content = $this->github->getFileContent($review->owner, $review->repo, $request->file);
                     $files[$request->file] = $content;
                 } catch (\Exception) {}
             }
 
-            $fixed = $claude->fixIssue($request->issue_title, $request->issue_desc, $files);
+            $fixed = $this->claude->fixIssue($request->issue_title, $request->issue_desc, $files);
             return response()->json([
                 'status'      => 'ok',
                 'before'      => $fixed['before'] ?? null,

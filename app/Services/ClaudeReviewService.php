@@ -36,7 +36,8 @@ SYS;
 
         $fileContents = '';
         foreach ($files as $path => $content) {
-            $fileContents .= "\n\n### {$path}\n<file_content>\n" . mb_substr($content, 0, 4000) . "\n</file_content>";
+            $safe = str_replace('</file_content>', '<\\/file_content>', mb_substr($content, 0, 4000));
+            $fileContents .= "\n\n### {$path}\n<file_content>\n{$safe}\n</file_content>";
         }
 
         $prompt = <<<PROMPT
@@ -76,7 +77,7 @@ PROMPT;
     {
         $fileContents = '';
         foreach ($files as $path => $content) {
-            $preview = mb_substr($content, 0, 3000);
+            $preview = str_replace('</file_content>', '<\\/file_content>', mb_substr($content, 0, 3000));
             $fileContents .= "\n\n### {$path}\n<file_content>\n{$preview}\n</file_content>";
         }
 

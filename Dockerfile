@@ -7,12 +7,10 @@ COPY . .
 RUN npm run build
 
 # ── Stage 2: PHP runtime ─────────────────────────────────────────────
-FROM php:8.4-cli
+FROM php:8.4-alpine
 
-RUN apt-get update && apt-get install -y \
-    git curl unzip libpq-dev libzip-dev zip \
-    && docker-php-ext-install pdo pdo_pgsql zip pcntl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache git curl unzip postgresql-dev libzip-dev \
+    && docker-php-ext-install pdo pdo_pgsql zip pcntl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
