@@ -25,12 +25,14 @@ class ProcessReviewJob implements ShouldQueue
             $github = new GitHubService();
             $claude = new ClaudeReviewService();
 
-            $review->update(['status' => 'processing', 'progress_step' => 'reading_repository']);
+            $review->update(['status' => 'processing', 'progress_step' => 'fetching_repository']);
 
             $stats  = $github->getRepoStats($review->owner, $review->repo);
             $branch = $stats['default_branch'];
             $tree   = $github->getFileTree($review->owner, $review->repo, $branch);
             $paths  = $github->selectKeyFiles($tree);
+
+            $review->update(['progress_step' => 'reading_files']);
 
             $files = [];
             foreach ($paths as $path) {

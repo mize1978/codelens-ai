@@ -36,10 +36,11 @@
 
     // step → { pct, console, mascot }
     const STEPS = {
-        pending:            { pct: 8,  log: '[QUEUE]  ジョブキューに追加しました...',      mascot: 'いいコードあるかな…' },
-        reading_repository: { pct: 28, log: '[GITHUB] リポジトリを取得中...',              mascot: 'READMEも見てみよう！' },
-        analyzing:          { pct: 62, log: '[CLAUDE] AIがコードを解析中...',             mascot: 'おっ、設計がきれい！' },
-        generating_report:  { pct: 85, log: '[CLAUDE] レポートを生成中...',               mascot: 'もう少し詳しく見てみるね…' },
+        pending:             { pct: 5,  log: '[QUEUE]  解析待ち...',                    mascot: 'いいコードあるかな…' },
+        fetching_repository: { pct: 22, log: '[GITHUB] GitHubへ接続中...',             mascot: 'リポジトリ探してるよ！' },
+        reading_files:       { pct: 42, log: '[READ]   ソースコードを読み込み中...',    mascot: 'コード全部チェック中！' },
+        analyzing:           { pct: 65, log: '[CLAUDE] AIがレビュー中...',             mascot: 'おっ、設計がきれい！' },
+        generating_report:   { pct: 85, log: '[CLAUDE] レポートを生成中...',           mascot: 'もう少し詳しく見てみるね…' },
     };
 
     const pmEl       = document.getElementById('pm-text');
@@ -74,7 +75,7 @@
     }
 
     // アニメーション: animPct を targetPct に近づける（上限: targetPct + 10）
-    setStep('pending');
+    setStep('{{ $review->progress_step ?: "pending" }}');
     document.querySelectorAll('.logo-icon').forEach(el => el.classList.add('spinning'));
 
     const glint = document.getElementById('pm-glint');
