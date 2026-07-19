@@ -9,7 +9,8 @@ class Review extends Model
     protected $fillable = [
         'github_url', 'owner', 'repo', 'branch',
         'language', 'quality_score', 'security_score',
-        'maintainability_score', 'review_data', 'status', 'ip_hash', 'view_count',
+        'maintainability_score', 'review_data', 'status',
+        'progress_step', 'error_message', 'ip_hash', 'view_count',
     ];
 
     protected $casts = [

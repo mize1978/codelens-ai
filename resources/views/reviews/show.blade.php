@@ -32,31 +32,51 @@
 
 <script>
 (function() {
-    const url = "{{ route('reviews.process', $review) }}";
-    const token = "{{ csrf_token() }}";
+    const statusUrl = "{{ route('reviews.status', $review) }}";
 
-    // CodeLensくん ステージ別セリフ
-    const stages = [
-        { from: 0,  text: 'いいコードあるかな…' },
-        { from: 18, text: 'READMEも見てみよう！' },
-        { from: 43, text: 'おっ、設計がきれい！' },
-        { from: 82, text: 'もう少し詳しく見てみるね…' },
-    ];
-    const pmEl = document.getElementById('pm-text');
-    let currentStageIdx = -1;
-    function setStageText(idx) {
-        if (idx === currentStageIdx || !pmEl) return;
-        currentStageIdx = idx;
-        pmEl.style.transition = 'opacity 0.35s';
-        pmEl.style.opacity = '0';
-        setTimeout(() => { pmEl.textContent = stages[idx].text; pmEl.style.opacity = '1'; }, 360);
+    // step → { pct, console, mascot }
+    const STEPS = {
+        pending:            { pct: 8,  log: '[QUEUE]  ジョブキューに追加しました...',      mascot: 'いいコードあるかな…' },
+        reading_repository: { pct: 28, log: '[GITHUB] リポジトリを取得中...',              mascot: 'READMEも見てみよう！' },
+        analyzing:          { pct: 62, log: '[CLAUDE] AIがコードを解析中...',             mascot: 'おっ、設計がきれい！' },
+        generating_report:  { pct: 85, log: '[CLAUDE] レポートを生成中...',               mascot: 'もう少し詳しく見てみるね…' },
+    };
+
+    const pmEl       = document.getElementById('pm-text');
+    const consoleBox = document.getElementById('console-box');
+    const bar        = document.getElementById('progress-bar');
+    const label      = document.getElementById('progress-label');
+
+    let currentStep = '';
+    let animPct     = 0;
+    let targetPct   = STEPS.pending.pct;
+
+    function setStep(step) {
+        if (step === currentStep || !STEPS[step]) return;
+        currentStep = step;
+        const cfg = STEPS[step];
+
+        // console line
+        const line = document.createElement('div');
+        line.className = 'console-line';
+        line.textContent = cfg.log;
+        consoleBox.appendChild(line);
+        consoleBox.scrollTop = consoleBox.scrollHeight;
+
+        // mascot text
+        if (pmEl) {
+            pmEl.style.transition = 'opacity 0.35s';
+            pmEl.style.opacity = '0';
+            setTimeout(() => { pmEl.textContent = cfg.mascot; pmEl.style.opacity = '1'; }, 360);
+        }
+
+        targetPct = cfg.pct;
     }
-    setStageText(0);
 
-    // ⑤ ロゴスピン開始
+    // アニメーション: animPct を targetPct に近づける（上限: targetPct + 10）
+    setStep('pending');
     document.querySelectorAll('.logo-icon').forEach(el => el.classList.add('spinning'));
 
-    // 虫眼鏡キラッ（4秒ごと）
     const glint = document.getElementById('pm-glint');
     if (glint) {
         setInterval(() => {
@@ -65,104 +85,67 @@
             glint.classList.add('flash');
         }, 4000);
     }
-    const consoleBox = document.getElementById('console-box');
-    const bar = document.getElementById('progress-bar');
-    const label = document.getElementById('progress-label');
 
-    const steps = [
-        [800,  '[GITHUB] リポジトリ情報を取得中...'],
-        [1600, '[GITHUB] ファイルツリーをスキャン中...'],
-        [2400, '[READ]   ソースファイルを読み込み中...'],
-        [3200, '[CLAUDE] AIエンジンに解析依頼中...'],
-        [5000, '[CLAUDE] コード品質を評価中...'],
-        [7000, '[CLAUDE] セキュリティリスクをチェック中...'],
-        [9000, '[CLAUDE] レポートを生成中...'],
-    ];
-
-    steps.forEach(([delay, msg]) => {
-        setTimeout(() => {
-            const line = document.createElement('div');
-            line.className = 'console-line';
-            line.textContent = msg;
-            consoleBox.appendChild(line);
-            consoleBox.scrollTop = consoleBox.scrollHeight;
-        }, delay);
-    });
-
-    // プログレス — 速度をステージで変える（合計 ~80s）
-    let pct = 0;
-    function getIncrement(p) {
-        if (p < 18) return 1.0;   // 0→18: ~5.4s
-        if (p < 43) return 0.38;  // 18→43: ~19.7s
-        if (p < 82) return 0.16;  // 43→82: ~48.8s
-        return 0.07;               // 82→92: じわじわ
-    }
-    const pctInterval = setInterval(() => {
-        pct = Math.min(pct + getIncrement(pct), 92);
-        const d = Math.floor(pct);
-        bar.style.width = d + '%';
+    setInterval(() => {
+        const cap = Math.min(targetPct + 8, 92);
+        if (animPct < cap) animPct = Math.min(animPct + 0.3, cap);
+        const d = Math.floor(animPct);
+        bar.style.width   = d + '%';
         label.textContent = d + '%';
-        for (let i = stages.length - 1; i >= 0; i--) {
-            if (d >= stages[i].from) { setStageText(i); break; }
-        }
     }, 300);
+
+    function onComplete() {
+        document.querySelectorAll('.logo-icon').forEach(el => el.classList.remove('spinning'));
+        if (window.CodeLensStatus) window.CodeLensStatus.set('complete', {});
+
+        bar.style.width   = '95%';
+        label.textContent = '95%';
+        const mascotImg = document.querySelector('.pm-main-img');
+        if (mascotImg) {
+            mascotImg.classList.remove('found');
+            void mascotImg.offsetWidth;
+            mascotImg.classList.add('found');
+            setTimeout(() => mascotImg.classList.remove('found'), 250);
+        }
+        if (pmEl) {
+            pmEl.style.transition = 'opacity 0.25s';
+            pmEl.style.opacity = '0';
+            setTimeout(() => { pmEl.textContent = 'ほぼ見つかった！'; pmEl.style.opacity = '1'; }, 260);
+        }
+        setTimeout(() => {
+            bar.style.width   = '100%';
+            label.textContent = '100%';
+            if (pmEl) {
+                pmEl.style.opacity = '0';
+                setTimeout(() => { pmEl.textContent = '見つけた！！'; pmEl.style.opacity = '1'; }, 260);
+            }
+        }, 750);
+        setTimeout(() => showReviewComplete(() => location.reload()), 1100);
+    }
 
     async function poll() {
         try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json' }
-            });
+            const res  = await fetch(statusUrl);
             const json = await res.json();
-            if (json.status === 'complete' || json.status === 'failed') {
-                clearInterval(pctInterval);
-                document.querySelectorAll('.logo-icon').forEach(el => el.classList.remove('spinning'));
-                if (window.CodeLensStatus) window.CodeLensStatus.set('complete', {
-                  latency: json.latency,
-                  files:   json.files,
-                });
 
-                // 95% → 100% の一瞬演出
-                bar.style.width = '95%';
-                label.textContent = '95%';
-                // ✨ 200ms フラッシュ
-                const mascotImg = document.querySelector('.pm-main-img');
-                if (mascotImg) {
-                    mascotImg.classList.remove('found');
-                    void mascotImg.offsetWidth;
-                    mascotImg.classList.add('found');
-                    setTimeout(() => mascotImg.classList.remove('found'), 250);
-                }
-                if (pmEl) {
-                    pmEl.style.transition = 'opacity 0.25s';
-                    pmEl.style.opacity = '0';
-                    setTimeout(() => { pmEl.textContent = 'ほぼ見つかった！'; pmEl.style.opacity = '1'; }, 260);
-                }
-                setTimeout(() => {
-                    bar.style.width = '100%';
-                    label.textContent = '100%';
-                    if (pmEl) {
-                        pmEl.style.opacity = '0';
-                        setTimeout(() => { pmEl.textContent = '見つけた！！'; pmEl.style.opacity = '1'; }, 260);
-                    }
-                }, 750);
-
-                if (json.status === 'complete') {
-                    setTimeout(() => showReviewComplete(() => location.reload()), 1100);
-                } else {
-                    showMascot('/images/cl-sleep.png', '今日はちょっと難しいコードかも…', 3000);
-                    setTimeout(() => location.reload(), 3400);
-                }
-            } else {
-                setTimeout(poll, 3000);
+            if (json.status === 'complete') {
+                onComplete();
+                return;
             }
+            if (json.status === 'failed') {
+                showMascot('/images/cl-sleep.png', '今日はちょっと難しいコードかも…', 3000);
+                setTimeout(() => location.reload(), 3400);
+                return;
+            }
+            if (json.progress_step) setStep(json.progress_step);
+            setTimeout(poll, 2000);
         } catch(e) {
-            setTimeout(poll, 5000);
+            setTimeout(poll, 4000);
         }
     }
 
     if (window.CodeLensStatus) window.CodeLensStatus.set('reviewing');
-    setTimeout(poll, 2000);
+    setTimeout(poll, 1500);
 })();
 </script>
 

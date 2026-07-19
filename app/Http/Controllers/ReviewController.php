@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessReviewJob;
 use App\Models\Review;
 use App\Services\GitHubService;
 use App\Services\ClaudeReviewService;
@@ -35,6 +36,8 @@ class ReviewController extends Controller
             'ip_hash'    => hash('sha256', $request->ip()),
         ]);
 
+        ProcessReviewJob::dispatch($review);
+
         return redirect()->route('reviews.show', $review);
     }
 
@@ -44,59 +47,12 @@ class ReviewController extends Controller
         return view('reviews.show', compact('review'));
     }
 
-    public function process(Review $review)
+    public function status(Review $review)
     {
-        if ($review->status === 'complete') {
-            return response()->json(['status' => 'complete', 'data' => $review->review_data]);
-        }
-
-        $review->update(['status' => 'processing']);
-
-        try {
-            $github = new GitHubService();
-            $claude = new ClaudeReviewService();
-
-            // GitHub stats + repo info
-            $stats  = $github->getRepoStats($review->owner, $review->repo);
-            $branch = $stats['default_branch'];
-
-            // File tree + key files
-            $tree  = $github->getFileTree($review->owner, $review->repo, $branch);
-            $paths = $github->selectKeyFiles($tree);
-
-            $files = [];
-            foreach ($paths as $path) {
-                try {
-                    $files[$path] = $github->getFileContent($review->owner, $review->repo, $path);
-                } catch (\Exception) {}
-            }
-
-            // Claude review
-            $data = $claude->review($review->owner, $review->repo, $files);
-            $data['github_stats'] = $stats;
-            $data['analyzed_files'] = array_keys($files);
-
-            $review->update([
-                'status'                => 'complete',
-                'language'              => $data['language'] ?? null,
-                'quality_score'         => $data['quality_score'] ?? null,
-                'security_score'        => $data['security_score'] ?? null,
-                'maintainability_score' => $data['maintainability_score'] ?? null,
-                'branch'                => $branch,
-                'review_data'           => $data,
-            ]);
-
-            return response()->json([
-                'status'  => 'complete',
-                'data'    => $data,
-                'latency' => $claude->lastLatency,
-                'files'   => count($files),
-            ]);
-
-        } catch (\Exception $e) {
-            $review->update(['status' => 'failed']);
-            return response()->json(['status' => 'failed', 'error' => $e->getMessage()], 500);
-        }
+        return response()->json([
+            'status'        => $review->status,
+            'progress_step' => $review->progress_step,
+        ]);
     }
 
     public function fix(Request $request, Review $review)
