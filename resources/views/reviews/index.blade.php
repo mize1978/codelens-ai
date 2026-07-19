@@ -117,48 +117,65 @@
     <div class="lib-shelf-wrap">
       <div class="library-shelf">
 
-        <a class="lib-book" href="https://notion.so/3a0d9f65223b81c5acaff8a6a09cf9c0" target="_blank" rel="noopener">
-          <img src="/images/library/book-codelens.png" alt="Development Journal" class="lib-book-img">
+        <a class="lib-book lib-book--locked" href="#" data-locked>
+          <div class="lib-book-lock-wrap">
+            <img src="/images/library/book-codelens.png" alt="Development Journal" class="lib-book-img">
+            <span class="lib-book-lock-icon">🔒</span>
+          </div>
           <div class="lib-book-label">
             <span class="lib-book-name">Dev Journal</span>
-            <span class="lib-book-open">Open →</span>
+            <span class="lib-book-open lib-book-open--locked">Locked</span>
           </div>
         </a>
 
-        <a class="lib-book" href="https://notion.so/3a0d9f65223b8106b430db5dea35edec" target="_blank" rel="noopener">
-          <img src="/images/library/book-design-bible.png" alt="Design Bible" class="lib-book-img">
+        <a class="lib-book lib-book--locked" href="#" data-locked>
+          <div class="lib-book-lock-wrap">
+            <img src="/images/library/book-design-bible.png" alt="Design Bible" class="lib-book-img">
+            <span class="lib-book-lock-icon">🔒</span>
+          </div>
           <div class="lib-book-label">
             <span class="lib-book-name">Design Bible</span>
-            <span class="lib-book-open">Open →</span>
+            <span class="lib-book-open lib-book-open--locked">Locked</span>
           </div>
         </a>
 
-        <a class="lib-book" href="https://notion.so/3a0d9f65223b811790cafc6cfbd8fc2f" target="_blank" rel="noopener">
-          <img src="/images/library/book-knowledge.png" alt="Knowledge" class="lib-book-img">
+        <a class="lib-book lib-book--locked" href="#" data-locked>
+          <div class="lib-book-lock-wrap">
+            <img src="/images/library/book-knowledge.png" alt="Knowledge" class="lib-book-img">
+            <span class="lib-book-lock-icon">🔒</span>
+          </div>
           <div class="lib-book-label">
             <span class="lib-book-name">Knowledge</span>
-            <span class="lib-book-open">Open →</span>
+            <span class="lib-book-open lib-book-open--locked">Locked</span>
           </div>
         </a>
 
-        <a class="lib-book" href="https://notion.so/3a0d9f65223b819eaefbcb98e01ac80e" target="_blank" rel="noopener">
-          <img src="/images/library/book-projects.png" alt="Projects" class="lib-book-img">
+        <a class="lib-book lib-book--locked" href="#" data-locked>
+          <div class="lib-book-lock-wrap">
+            <img src="/images/library/book-projects.png" alt="Projects" class="lib-book-img">
+            <span class="lib-book-lock-icon">🔒</span>
+          </div>
           <div class="lib-book-label">
             <span class="lib-book-name">Projects</span>
-            <span class="lib-book-open">Open →</span>
+            <span class="lib-book-open lib-book-open--locked">Locked</span>
           </div>
         </a>
 
-        <a class="lib-book" href="https://notion.so/3a0d9f65223b81a4b1f9c34fac0edf84" target="_blank" rel="noopener">
-          <img src="/images/library/book-ideas.png" alt="Ideas" class="lib-book-img">
+        <a class="lib-book lib-book--locked" href="#" data-locked>
+          <div class="lib-book-lock-wrap">
+            <img src="/images/library/book-ideas.png" alt="Ideas" class="lib-book-img">
+            <span class="lib-book-lock-icon">🔒</span>
+          </div>
           <div class="lib-book-label">
             <span class="lib-book-name">Ideas</span>
-            <span class="lib-book-open">Open →</span>
+            <span class="lib-book-open lib-book-open--locked">Locked</span>
           </div>
         </a>
 
-        <a class="lib-book lib-book--archive" href="#" target="_blank" rel="noopener">
-          <img src="/images/library/book-archive.png" alt="Archive" class="lib-book-img">
+        <a class="lib-book lib-book--archive" href="#" rel="noopener">
+          <div class="lib-book-lock-wrap">
+            <img src="/images/library/book-archive.png" alt="Archive" class="lib-book-img">
+          </div>
           <div class="lib-book-label">
             <span class="lib-book-name">Archive</span>
             <span class="lib-book-open">Open →</span>
@@ -171,6 +188,16 @@
       <div class="lib-shelf-board"></div>
     </div>
 
+  </div>
+
+  {{-- Locked Book Modal --}}
+  <div class="lib-locked-modal" id="lib-locked-modal" role="dialog" aria-modal="true">
+    <div class="lib-locked-modal-box">
+      <span class="lib-locked-modal-icon">🔒</span>
+      <p class="lib-locked-modal-title">This book is currently being written.</p>
+      <p class="lib-locked-modal-desc">It will be available in a future update.</p>
+      <button class="lib-locked-modal-close" id="lib-locked-modal-close">Close</button>
+    </div>
   </div>
 
   {{-- Popular Reviews --}}
@@ -478,7 +505,96 @@
 .lib-book--archive:hover .lib-book-img {
   transform: translateY(-5px) scale(1.01);
   transition: transform 0.35s ease, filter 0.35s ease;
-  filter: saturate(0.38) brightness(0.75); /* 金縁グローなし */
+  filter: saturate(0.38) brightness(0.75);
+}
+
+/* Lock wrap — positions the 🔒 badge */
+.lib-book-lock-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* Locked books — dim and desaturated */
+.lib-book--locked .lib-book-img {
+  filter: saturate(0.35) brightness(0.55);
+}
+.lib-book--locked:hover .lib-book-img {
+  transform: translateY(-4px) scale(1.02);
+  filter: saturate(0.50) brightness(0.70);
+}
+.lib-book--locked .lib-book-open--locked {
+  color: rgba(180,140,60,0.55);
+  font-size: 0.48rem;
+  letter-spacing: 0.12em;
+}
+
+/* 🔒 badge — bottom-right corner of the book */
+.lib-book-lock-icon {
+  position: absolute;
+  bottom: 4px; right: 4px;
+  font-size: 0.62rem;
+  line-height: 1;
+  opacity: 0.70;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.6));
+}
+
+/* Locked modal overlay */
+.lib-locked-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+}
+.lib-locked-modal.is-open {
+  display: flex;
+}
+.lib-locked-modal-box {
+  background: #0e1621;
+  border: 1px solid rgba(0,185,255,0.18);
+  border-radius: 14px;
+  padding: 36px 40px;
+  max-width: 340px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(0,150,255,0.12), 0 8px 32px rgba(0,0,0,0.6);
+}
+.lib-locked-modal-icon {
+  font-size: 2rem;
+  margin-bottom: 14px;
+  display: block;
+}
+.lib-locked-modal-title {
+  font-size: 0.90rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.88);
+  margin-bottom: 10px;
+  letter-spacing: 0.04em;
+}
+.lib-locked-modal-desc {
+  font-size: 0.74rem;
+  color: rgba(160,190,220,0.70);
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+.lib-locked-modal-close {
+  background: rgba(0,185,255,0.12);
+  border: 1px solid rgba(0,185,255,0.25);
+  color: rgba(0,200,255,0.80);
+  font-size: 0.72rem;
+  letter-spacing: 0.10em;
+  padding: 8px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.lib-locked-modal-close:hover {
+  background: rgba(0,185,255,0.22);
+  color: rgba(0,220,255,1);
 }
 
 /* Responsive */
@@ -492,6 +608,26 @@
 </style>
 
 <script>
+// Locked book modal
+(function() {
+  const modal = document.getElementById('lib-locked-modal');
+  const closeBtn = document.getElementById('lib-locked-modal-close');
+  document.querySelectorAll('.lib-book--locked').forEach(function(book) {
+    book.addEventListener('click', function(e) {
+      e.preventDefault();
+      modal.classList.add('is-open');
+    });
+  });
+  function closeModal() { modal.classList.remove('is-open'); }
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+})();
+
 document.getElementById('review-form').addEventListener('submit', function(e) {
   e.preventDefault();
   const form = this;
