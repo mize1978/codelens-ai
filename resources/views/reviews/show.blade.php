@@ -260,20 +260,13 @@
 @php
     $analyzedCount = count($data['analyzed_files'] ?? []);
     $totalCount    = $data['total_file_count'] ?? 0;
-    $coveragePct   = $totalCount > 0 ? round($analyzedCount / $totalCount * 100) : null;
-    $coverageColor = $coveragePct === null ? '#888' : ($coveragePct >= 70 ? '#00cc77' : ($coveragePct >= 40 ? '#ffaa00' : '#ff6644'));
-    $coverageLabel = $coveragePct === null ? '—' : ($coveragePct >= 70 ? '高い信頼度' : ($coveragePct >= 40 ? '参考程度' : '限定的な解析'));
 @endphp
 @if($analyzedCount > 0)
-<div class="coverage-bar" style="--cov-color: {{ $coverageColor }}">
-    <span class="cov-icon">📁</span>
-    <span class="cov-files">{{ $analyzedCount }}
-        @if($totalCount > 0) / {{ $totalCount }} @endif
-        files analyzed
-    </span>
-    @if($coveragePct !== null)
-    <span class="cov-pct">{{ $coveragePct }}%</span>
-    <span class="cov-label">{{ $coverageLabel }}</span>
+<div class="coverage-bar" style="--cov-color: #4488ff">
+    <span class="cov-icon">🔍</span>
+    <span class="cov-files">重要ファイル {{ $analyzedCount }} 件を精査</span>
+    @if($totalCount > 0)
+    <span class="cov-label">全 {{ number_format($totalCount) }} ファイル中 AI が優先度順に選択</span>
     @endif
 </div>
 @endif

@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="docs/images/hero.png" alt="CodeLensAI" width="820">
+  <img src="docs/images/banner.png" alt="CodeLensAI" width="900">
 </p>
 <p align="center">
-  <b>AI-powered code review that turns feedback into a learning experience.</b>
+  <b>GitHub Repository → AI Review → Start Fixing</b>
 </p>
 <p align="center">
-  Analyze any GitHub repository with AI, receive actionable feedback, prioritize issues with severity scoring,
-  generate AI-powered fixes, and level up your code quality—with a little help from CodeLens-kun.
+  Paste any GitHub URL. Get an AI-powered code review with severity scoring, prioritized actions,<br>
+  and one-click fixes — guided by CodeLens-kun.
 </p>
 <p align="center">
   <img src="https://img.shields.io/badge/Laravel-FF2D20?style=flat&logo=laravel&logoColor=white" alt="Laravel">
@@ -89,7 +89,7 @@ saved to your Library (Dev Journal), allowing you to build a personal knowledge 
 |-------------|-----------------------------|
 | Framework   | Laravel (PHP)               |
 | Views / UI  | Blade + Tailwind CSS        |
-| Database    | MySQL                       |
+| Database    | PostgreSQL                  |
 | AI          | Anthropic Claude API        |
 | Infra       | Docker / Docker Compose     |
 

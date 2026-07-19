@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    command: bash -c "until pg_isready -h db -U postgres; do sleep 1; done && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
+    command: bash -c "composer install --no-interaction && until pg_isready -h db -U postgres; do sleep 1; done && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
     volumes:
       - .:/app
     ports:
@@ -14,7 +14,7 @@ services:
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
-      APP_KEY: base64:PLACEHOLDER_WILL_BE_GENERATED
+      APP_KEY: base64:Qt6ivpiUIvetQAo3RbrDvAb8EadCCm8xY0Cf7XcnocU=
       DB_CONNECTION: pgsql
       DB_HOST: db
       DB_PORT: 5432
@@ -23,7 +23,7 @@ services:
       DB_PASSWORD: password
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      QUEUE_CONNECTION: redis
+      QUEUE_CONNECTION: database
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       GITHUB_TOKEN: ${GITHUB_TOKEN}
 
@@ -41,6 +41,32 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  worker:
+    build: .
+    command: bash -c "until pg_isready -h db -U postgres; do sleep 1; done && php artisan queue:work --sleep=3 --tries=1 --timeout=360 --no-interaction"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: base64:Qt6ivpiUIvetQAo3RbrDvAb8EadCCm8xY0Cf7XcnocU=
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: codelens
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QUEUE_CONNECTION: database
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
 
   redis:
     image: redis:7
