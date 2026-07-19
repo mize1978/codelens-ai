@@ -8,7 +8,7 @@
   <div style="text-align:center;margin-bottom:36px">
     <p class="ai-system-label">AI CODE REVIEW SYSTEM v1.0</p>
     <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:10px">
-      <img src="/images/devinsight-logo.png" id="hero-logo" style="width:56px;height:56px;border-radius:14px;filter:drop-shadow(0 0 10px rgba(0,140,255,0.35))" alt="logo">
+      <img src="/images/devinsight-logo.png" id="hero-logo" style="width:56px;height:56px;border-radius:14px;filter:drop-shadow(0 0 14px rgba(0,150,255,0.55)) drop-shadow(0 0 4px rgba(120,80,255,0.3))" alt="logo">
       <h1 class="hero-logo-text" style="margin-bottom:0">CodeLens AI</h1>
     </div>
     <p style="font-size:0.88rem;color:var(--text-dim)">GitHubリポジトリURLを入力するだけで、AIがコードを解析してレビューします</p>

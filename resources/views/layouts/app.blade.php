@@ -81,7 +81,7 @@
     .logo-icon {
       width: 28px; height: 28px; border-radius: 7px;
       object-fit: cover;
-      filter: drop-shadow(0 0 4px rgba(0,140,255,0.3));
+      filter: drop-shadow(0 0 7px rgba(0,150,255,0.5)) drop-shadow(0 0 2px rgba(120,80,255,0.3));
     }
     .nav { display: flex; gap: 20px; align-items: center; }
     .nav a { font-size: 0.73rem; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
@@ -266,6 +266,7 @@
       background: linear-gradient(135deg, var(--cyan), var(--blue), var(--purple));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
       margin-bottom: 12px; letter-spacing: -0.02em;
+      filter: drop-shadow(0 0 10px rgba(80,100,255,0.45)) drop-shadow(0 0 20px rgba(40,80,255,0.2));
     }
 
     /* Header logo — subtle blue breathing */
