@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>@yield('title', 'CodeLens AI — AIコードレビュー')</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta property="og:title" content="CodeLens AI — AIコードレビュー">
+  <meta property="og:description" content="GitHubリポジトリをAIが解析し、改善をレビューするWebサービス。非同期Job・GitHub API・Claude APIを用い、レビューから修正までをナビゲートします。">
+  <meta property="og:image" content="https://raw.githubusercontent.com/mize1978/codelens-ai/main/docs/images/banner.png">
+  <meta property="og:url" content="https://codelens-ai-vplg.onrender.com">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/mize1978/codelens-ai/main/docs/images/banner.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
