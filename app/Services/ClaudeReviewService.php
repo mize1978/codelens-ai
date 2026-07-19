@@ -130,7 +130,7 @@ PROMPT;
             'x-api-key'         => env('ANTHROPIC_API_KEY'),
             'anthropic-version' => '2023-06-01',
             'content-type'      => 'application/json',
-        ])->timeout(120)->post($this->endpoint, $body);
+        ])->timeout(180)->post($this->endpoint, $body);
 
         $this->lastLatency = round(microtime(true) - $t0, 2);
 

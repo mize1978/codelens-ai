@@ -12,7 +12,7 @@ class ProcessReviewJob implements ShouldQueue
 {
     use Queueable;
 
-    public int $timeout = 300;
+    public int $timeout = 360;
     public int $tries   = 1;
 
     public function __construct(public Review $review) {}
