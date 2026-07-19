@@ -514,29 +514,34 @@
   width: 100%;
 }
 
-/* Locked books — dim and desaturated */
+/* Locked books — still alive, barely touched */
 .lib-book--locked .lib-book-img {
-  filter: saturate(0.35) brightness(0.55);
+  filter: saturate(0.90);
 }
 .lib-book--locked:hover .lib-book-img {
-  transform: translateY(-4px) scale(1.02);
-  filter: saturate(0.50) brightness(0.70);
+  transform: translateY(-6px) scale(1.03);
+  filter:
+    saturate(0.92)
+    drop-shadow(0 18px 8px rgba(0,0,0,0.50))
+    drop-shadow(0 0 10px rgba(185,148,52,0.28));
 }
 .lib-book--locked .lib-book-open--locked {
-  color: rgba(180,140,60,0.55);
+  color: rgba(160,200,255,0.50);
   font-size: 0.48rem;
   letter-spacing: 0.12em;
 }
 
-/* 🔒 badge — bottom-right corner of the book */
+/* 🔒 badge — silver-blue SF lock */
 .lib-book-lock-icon {
   position: absolute;
   bottom: 4px; right: 4px;
-  font-size: 0.62rem;
+  font-size: 0.60rem;
   line-height: 1;
-  opacity: 0.70;
   pointer-events: none;
-  filter: drop-shadow(0 0 3px rgba(0,0,0,0.6));
+  filter:
+    grayscale(1) brightness(2.2)
+    drop-shadow(0 0 4px rgba(140,200,255,0.90))
+    drop-shadow(0 0 2px rgba(0,0,0,0.70));
 }
 
 /* Locked modal overlay */
