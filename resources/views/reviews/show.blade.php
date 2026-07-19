@@ -318,7 +318,24 @@
     <div class="section-title">🎯 今すぐ直すべき3点</div>
     <ol class="priorities-list">
         @foreach($data['top_priorities'] as $p)
-        <li>{{ $p }}</li>
+        @php
+            $pFile   = is_array($p) ? ($p['file']   ?? null) : null;
+            $pAction = is_array($p) ? ($p['action'] ?? $p)   : $p;
+            $ghUrl   = $pFile
+                ? "https://github.com/{$review->owner}/{$review->repo}/blob/{$review->branch}/{$pFile}"
+                : null;
+        @endphp
+        <li>
+            <div class="prio-body">
+                @if($pFile)
+                <span class="prio-file">{{ $pFile }}</span>
+                @endif
+                <span class="prio-action">{{ $pAction }}</span>
+            </div>
+            @if($ghUrl)
+            <a class="prio-gh-link" href="{{ $ghUrl }}" target="_blank" rel="noopener" title="GitHubで開く">↗</a>
+            @endif
+        </li>
         @endforeach
     </ol>
 </div>
@@ -917,10 +934,14 @@ if (rfBtn) {
 .summary-text { color: #ccc; line-height: 1.7; margin: 0; }
 .bullet-list { margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8; }
 .priorities-card { border-color: rgba(255,170,0,0.30); background: rgba(255,140,0,0.04); }
-.priorities-list { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.priorities-list li { display: flex; align-items: flex-start; gap: 12px; color: rgba(255,255,255,0.82); font-size: 0.88rem; line-height: 1.6; padding: 10px 14px; background: rgba(255,140,0,0.06); border: 1px solid rgba(255,140,0,0.14); border-radius: 8px; counter-increment: priority; }
-.priorities-list li::before { content: counter(priority); counter-reset: none; flex-shrink: 0; width: 22px; height: 22px; background: rgba(255,170,0,0.18); border: 1px solid rgba(255,170,0,0.40); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: rgba(255,200,80,0.90); line-height: 1; padding-top: 1px; }
-.priorities-list { counter-reset: priority; }
+.priorities-list { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; counter-reset: priority; }
+.priorities-list li { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; background: rgba(255,140,0,0.06); border: 1px solid rgba(255,140,0,0.14); border-radius: 8px; counter-increment: priority; }
+.priorities-list li::before { content: counter(priority); flex-shrink: 0; width: 22px; height: 22px; background: rgba(255,170,0,0.18); border: 1px solid rgba(255,170,0,0.40); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: rgba(255,200,80,0.90); line-height: 1; padding-top: 1px; margin-top: 1px; }
+.prio-body { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.prio-file { font-family: monospace; font-size: 0.75rem; color: rgba(255,200,80,0.80); background: rgba(255,170,0,0.10); border: 1px solid rgba(255,170,0,0.20); border-radius: 4px; padding: 1px 7px; display: inline-block; width: fit-content; }
+.prio-action { font-size: 0.86rem; color: rgba(255,255,255,0.80); line-height: 1.55; }
+.prio-gh-link { flex-shrink: 0; margin-top: 2px; padding: 4px 8px; font-size: 0.72rem; color: rgba(0,200,255,0.65); border: 1px solid rgba(0,200,255,0.20); border-radius: 5px; text-decoration: none; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+.prio-gh-link:hover { color: rgba(0,220,255,1); border-color: rgba(0,200,255,0.55); }
 .security-list li { color: #ffaa88; }
 .review-closing-message { margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--border); color: #7a9bb5; font-size: 0.82rem; text-align: left; letter-spacing: 0.3px; }
 
