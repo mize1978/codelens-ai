@@ -27,15 +27,15 @@ class ReviewController extends Controller
     {
         $request->validate(['github_url' => 'required|string|max:500']);
 
-        $ipHash = hash('sha256', $request->ip());
-        $limit  = (int) config('app.daily_review_limit', 10);
-        $used   = Review::where('ip_hash', $ipHash)->whereDate('created_at', today())->count();
-
-        if ($used >= $limit) {
+        $limit = (int) config('app.daily_review_limit', 10);
+        $key   = 'review:' . hash('sha256', $request->ip());
+        if (RateLimiter::tooManyAttempts($key, $limit)) {
             return back()
                 ->withErrors(['github_url' => "1日の上限（{$limit}回）に達しました。日付が変わってからお試しください。"])
                 ->withInput();
         }
+        RateLimiter::hit($key, today()->secondsUntilEndOfDay());
+        $ipHash = hash('sha256', $request->ip());
 
         try {
             ['owner' => $owner, 'repo' => $repo] = $this->github->parseUrl($request->github_url);

@@ -17,13 +17,11 @@ class ProcessReviewJob implements ShouldQueue
 
     public function __construct(public Review $review) {}
 
-    public function handle(): void
+    public function handle(GitHubService $github, ClaudeReviewService $claude): void
     {
         $review = $this->review;
 
         try {
-            $github = new GitHubService();
-            $claude = new ClaudeReviewService();
 
             $review->update(['status' => 'processing', 'progress_step' => 'fetching_repository']);
 
