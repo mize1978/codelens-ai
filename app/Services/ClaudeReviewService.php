@@ -127,7 +127,7 @@ PROMPT;
         }
 
         $response = Http::withHeaders([
-            'x-api-key'         => env('ANTHROPIC_API_KEY'),
+            'x-api-key'         => config('services.anthropic.key'),
             'anthropic-version' => '2023-06-01',
             'content-type'      => 'application/json',
         ])->timeout(180)->post($this->endpoint, $body);

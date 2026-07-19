@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'anthropic' => [
+        'key' => env('ANTHROPIC_API_KEY'),
+    ],
+
+    'github' => [
+        'token' => env('GITHUB_TOKEN', ''),
+    ],
+
 ];

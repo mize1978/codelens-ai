@@ -11,7 +11,7 @@ class GitHubService
 
     public function __construct()
     {
-        $this->token = env('GITHUB_TOKEN', '');
+        $this->token = config('services.github.token', '');
     }
 
     public function parseUrl(string $url): array
