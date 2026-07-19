@@ -27,7 +27,7 @@
             </div>
             <p class="pm-text" id="pm-text"></p>
         </div>
-        <p class="proc-hint">この処理には30秒〜2分ほどかかる場合があります</p>
+        <p class="proc-hint">この処理には30秒〜2分ほどかかる場合があります。大規模なリポジトリほど時間がかかることがあります。</p>
     </div>
 </div>
 
@@ -41,7 +41,7 @@
         fetching_repository: { pct: 22, log: '[GITHUB] GitHubへ接続中...',             mascot: 'リポジトリ探してるよ！' },
         reading_files:       { pct: 42, log: '[READ]   ソースコードを読み込み中...',    mascot: 'コード全部チェック中！' },
         analyzing:           { pct: 65, log: '[CLAUDE] AIがレビュー中...',             mascot: 'おっ、設計がきれい！' },
-        generating_report:   { pct: 85, log: '[CLAUDE] レポートを生成中...',           mascot: 'もう少し詳しく見てみるね…' },
+        generating_report:   { pct: 85, log: '[CLAUDE] 改善提案をまとめています...',     mascot: 'もう少し詳しく見てみるね…' },
     };
 
     const pmEl       = document.getElementById('pm-text');
