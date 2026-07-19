@@ -12,8 +12,8 @@ class ProcessReviewJob implements ShouldQueue
 {
     use Queueable;
 
-    public int $timeout = 360;
-    public int $tries   = 1;
+    public int $timeout = 180;
+    public int $tries   = 2;
 
     public function __construct(public Review $review) {}
 
@@ -68,5 +68,14 @@ class ProcessReviewJob implements ShouldQueue
                 'error_message' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function failed(\Throwable $e): void
+    {
+        $this->review->update([
+            'status'        => 'failed',
+            'progress_step' => null,
+            'error_message' => $e->getMessage(),
+        ]);
     }
 }

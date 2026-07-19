@@ -8,7 +8,7 @@ php artisan view:cache
 
 # Queue worker — restart automatically if it crashes
 (while true; do
-    php artisan queue:work --sleep=3 --tries=1 --timeout=360 --no-interaction
+    php artisan queue:work --sleep=2 --tries=2 --timeout=180 --no-interaction
     echo "[entrypoint] queue:work exited, restarting in 5s..."
     sleep 5
 done) &
