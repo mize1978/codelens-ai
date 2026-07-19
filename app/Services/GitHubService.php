@@ -101,7 +101,19 @@ class GitHubService
             $ext = pathinfo($f['path'], PATHINFO_EXTENSION);
             return in_array($ext, $extensions) && ($f['size'] ?? 0) < 50000;
         });
-        usort($sourceFiles, fn($a, $b) => ($a['size'] ?? 0) <=> ($b['size'] ?? 0));
+
+        usort($sourceFiles, function ($a, $b) {
+            $score = fn($path) => match (true) {
+                str_contains($path, '/Services/') => 4,
+                str_contains($path, '/Controllers/') => 4,
+                str_contains($path, '/Jobs/') => 3,
+                str_contains($path, '/Models/') => 2,
+                str_contains($path, '/Middleware/') => 1,
+                default => 0,
+            };
+            $diff = $score($b['path']) <=> $score($a['path']);
+            return $diff !== 0 ? $diff : ($b['size'] ?? 0) <=> ($a['size'] ?? 0);
+        });
 
         foreach (array_slice($sourceFiles, 0, 8) as $f) {
             if (!in_array($f['path'], $selected)) {
