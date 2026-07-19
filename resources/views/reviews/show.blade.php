@@ -33,7 +33,7 @@
 
 <script>
 (function() {
-    const statusUrl = "{{ route('reviews.status', $review) }}";
+    const statusUrl = "/reviews/{{ $review->id }}/status";
 
     // step → { pct, console, mascot }
     const STEPS = {
@@ -145,6 +145,7 @@
             }
         }, 750);
         setTimeout(() => showReviewComplete(() => location.reload()), 1100);
+        setTimeout(() => location.reload(), 5000);
     }
 
     async function poll() {

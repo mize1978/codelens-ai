@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    command: bash -c "composer install --no-interaction && until pg_isready -h db -U postgres; do sleep 1; done && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
+    command: bash -c "composer install --no-interaction && sleep 3 && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
     volumes:
       - .:/app
     ports:
@@ -44,7 +44,7 @@ services:
 
   worker:
     build: .
-    command: bash -c "until pg_isready -h db -U postgres; do sleep 1; done && php artisan queue:work --sleep=3 --tries=1 --timeout=360 --no-interaction"
+    command: bash -c "sleep 3 && php artisan queue:work --sleep=3 --tries=1 --timeout=360 --no-interaction"
     volumes:
       - .:/app
     depends_on:
