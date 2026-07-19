@@ -12,7 +12,7 @@ services:
       - key: APP_KEY
         sync: false
       - key: APP_URL
-        value: https://codelens-ai.onrender.com
+        value: https://codelens-ai-vplg.onrender.com
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_URL
