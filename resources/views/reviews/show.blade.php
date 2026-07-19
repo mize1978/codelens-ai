@@ -27,6 +27,7 @@
             </div>
             <p class="pm-text" id="pm-text"></p>
         </div>
+        <p class="proc-hint">この処理には30秒〜2分ほどかかる場合があります</p>
     </div>
 </div>
 
@@ -48,23 +49,36 @@
     const bar        = document.getElementById('progress-bar');
     const label      = document.getElementById('progress-label');
 
-    let currentStep = '';
-    let animPct     = 0;
-    let targetPct   = STEPS.pending.pct;
+    const ANALYZING_LINES = [
+        '[CLAUDE] 設計パターンを確認中...',
+        '[CLAUDE] コード品質を分析中...',
+        '[CLAUDE] 重複処理を検出中...',
+        '[CLAUDE] セキュリティリスクをスキャン中...',
+        '[CLAUDE] 改善ポイントを整理中...',
+        '[CLAUDE] 依存関係をチェック中...',
+    ];
+
+    let currentStep    = '';
+    let animPct        = 0;
+    let targetPct      = STEPS.pending.pct;
+    let analyzingTimer = null;
+
+    function addConsoleLine(text) {
+        const line = document.createElement('div');
+        line.className = 'console-line';
+        line.textContent = text;
+        consoleBox.appendChild(line);
+        consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
 
     function setStep(step) {
         if (step === currentStep || !STEPS[step]) return;
+        if (analyzingTimer) { clearInterval(analyzingTimer); analyzingTimer = null; }
         currentStep = step;
         const cfg = STEPS[step];
 
-        // console line
-        const line = document.createElement('div');
-        line.className = 'console-line';
-        line.textContent = cfg.log;
-        consoleBox.appendChild(line);
-        consoleBox.scrollTop = consoleBox.scrollHeight;
+        addConsoleLine(cfg.log);
 
-        // mascot text
         if (pmEl) {
             pmEl.style.transition = 'opacity 0.35s';
             pmEl.style.opacity = '0';
@@ -72,6 +86,14 @@
         }
 
         targetPct = cfg.pct;
+
+        if (step === 'analyzing') {
+            let idx = 0;
+            analyzingTimer = setInterval(() => {
+                idx = (idx + 1) % ANALYZING_LINES.length;
+                addConsoleLine(ANALYZING_LINES[idx]);
+            }, 3500);
+        }
     }
 
     // アニメーション: animPct を targetPct に近づける（上限: targetPct + 10）
@@ -96,6 +118,7 @@
     }, 300);
 
     function onComplete() {
+        if (analyzingTimer) { clearInterval(analyzingTimer); analyzingTimer = null; }
         document.querySelectorAll('.logo-icon').forEach(el => el.classList.remove('spinning'));
         if (window.CodeLensStatus) window.CodeLensStatus.set('complete', {});
 
@@ -376,11 +399,32 @@
 
 {{-- ===== FAILED STATE ===== --}}
 @else
+@php
+    $errMsg   = $review->error_message ?? '';
+    $friendly = '予期しないエラーが発生しました。しばらく待ってからもう一度お試しください。';
+    if (str_contains($errMsg, 'rate limit') || str_contains($errMsg, '403'))
+        $friendly = 'GitHub APIの制限に達しました。しばらく待ってからもう一度お試しください。';
+    elseif (str_contains($errMsg, '404') || str_contains($errMsg, 'Not Found'))
+        $friendly = 'リポジトリが見つかりませんでした。URLを確認してください。';
+    elseif (str_contains($errMsg, 'cURL') || str_contains($errMsg, 'timeout') || str_contains($errMsg, 'connect'))
+        $friendly = 'ネットワークエラーが発生しました。しばらく待ってからもう一度お試しください。';
+    elseif (str_contains($errMsg, 'Anthropic') || str_contains($errMsg, 'claude') || str_contains($errMsg, 'API'))
+        $friendly = 'AIエンジンが応答しませんでした。しばらく待ってからもう一度お試しください。';
+@endphp
 <div class="failed-card">
     <div class="failed-icon">❌</div>
     <h2>解析に失敗しました</h2>
-    <p>{{ $review->owner }}/{{ $review->repo }}</p>
-    <a href="{{ route('reviews.index') }}" class="btn-back">← 再試行</a>
+    <p class="failed-repo">{{ $review->owner }}/{{ $review->repo }}</p>
+    <p class="failed-reason">{{ $friendly }}</p>
+    @if($errMsg)
+    <details class="failed-detail">
+        <summary>詳細を見る</summary>
+        <code>{{ $errMsg }}</code>
+    </details>
+    @endif
+    <div class="failed-actions">
+        <a href="{{ route('reviews.index') }}" class="btn-retry">← 再試行</a>
+    </div>
 </div>
 @endif
 
@@ -976,8 +1020,17 @@ if (rfBtn) {
 .pr-textarea { width: 100%; height: 200px; background: #0a0a1a; border: 1px solid #333; border-radius: 8px; color: #ccc; font-family: monospace; font-size: 0.8rem; padding: 12px; resize: vertical; box-sizing: border-box; }
 
 /* Failed */
-.failed-card { text-align: center; padding: 80px 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; max-width: 500px; margin: 60px auto; }
+.failed-card { text-align: center; padding: 60px 40px; background: var(--surface); border: 1px solid rgba(255,50,80,0.22); border-radius: 16px; max-width: 500px; margin: 60px auto; }
 .failed-icon { font-size: 3rem; margin-bottom: 16px; }
+.failed-repo { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 14px; }
+.failed-reason { color: rgba(255,200,200,0.80); font-size: 0.85rem; line-height: 1.6; margin-bottom: 20px; }
+.failed-detail { margin-bottom: 20px; }
+.failed-detail summary { font-size: 0.75rem; color: var(--text-muted); cursor: pointer; margin-bottom: 8px; }
+.failed-detail code { display: block; font-size: 0.70rem; color: rgba(255,100,100,0.70); background: rgba(255,50,50,0.05); border: 1px solid rgba(255,50,50,0.12); border-radius: 6px; padding: 10px 12px; text-align: left; line-height: 1.5; word-break: break-all; }
+.failed-actions { display: flex; justify-content: center; }
+.btn-retry { background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text-muted); padding: 10px 22px; border-radius: 8px; text-decoration: none; font-size: 0.88rem; transition: background 0.2s; }
+.btn-retry:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.proc-hint { font-size: 0.72rem; color: rgba(255,255,255,0.22); margin-top: 20px; letter-spacing: 0.02em; }
 
 /* Nav */
 .back-row { display: flex; gap: 12px; justify-content: center; margin-top: 32px; flex-wrap: wrap; }
