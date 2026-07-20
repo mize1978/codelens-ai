@@ -63,9 +63,15 @@ class ProcessReviewJob implements ShouldQueue
             $review->update([
                 'status'        => 'failed',
                 'progress_step' => null,
-                'error_message' => $e->getMessage(),
+                'error_message' => $this->sanitizeError($e->getMessage()),
             ]);
         }
+    }
+
+    private function sanitizeError(string $msg): string
+    {
+        $msg = preg_replace('/Bearer\s+\S+/i', 'Bearer [REDACTED]', $msg);
+        return mb_substr($msg, 0, 200);
     }
 
     public function failed(\Throwable $e): void
@@ -73,7 +79,7 @@ class ProcessReviewJob implements ShouldQueue
         $this->review->update([
             'status'        => 'failed',
             'progress_step' => null,
-            'error_message' => $e->getMessage(),
+            'error_message' => $this->sanitizeError($e->getMessage()),
         ]);
     }
 }

@@ -86,9 +86,9 @@ class ReviewController extends Controller
 
         try {
             $files = [];
-            if ($request->file && $review->review_data) {
+            if ($request->input('file') && $review->review_data) {
                 try {
-                    $content = $this->github->getFileContent($review->owner, $review->repo, $request->file);
+                    $content = $this->github->getFileContent($review->owner, $review->repo, $request->input('file'));
                     $files[$request->file] = $content;
                 } catch (\Exception) {}
             }

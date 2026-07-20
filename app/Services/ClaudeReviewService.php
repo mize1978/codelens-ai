@@ -8,7 +8,9 @@ class ClaudeReviewService
 {
     private string $model    = 'claude-sonnet-4-6';
     private string $endpoint = 'https://api.anthropic.com/v1/messages';
-    public float $lastLatency = 0.0;
+    private float $lastLatency = 0.0;
+
+    public function getLastLatency(): float { return $this->lastLatency; }
 
     public function review(string $owner, string $repo, array $files): array
     {
@@ -77,6 +79,8 @@ PROMPT;
 
     private function buildReviewPrompt(string $owner, string $repo, array $files): string
     {
+        $owner = preg_replace('/[^a-zA-Z0-9\-_.]/', '', $owner);
+        $repo  = preg_replace('/[^a-zA-Z0-9\-_.]/', '', $repo);
         $fileContents = '';
         foreach ($files as $path => $content) {
             $preview = str_replace('</file_content>', '<\\/file_content>', mb_substr($content, 0, 3000));

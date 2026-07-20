@@ -10,7 +10,7 @@ class Review extends Model
         'github_url', 'owner', 'repo', 'branch',
         'language', 'quality_score', 'security_score',
         'maintainability_score', 'review_data', 'status',
-        'progress_step', 'error_message', 'ip_hash', 'view_count',
+        'progress_step', 'error_message', 'view_count',
     ];
 
     protected $casts = [
