@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/Claude_AI-D97757?style=flat&logo=anthropic&logoColor=white" alt="Claude AI">
 </p>
 <p align="center">
-  <a href="https://codelens-ai.onrender.com"><strong>🚀 Live Demo</strong></a>
+  <a href="https://codelens-ai-vplg.onrender.com"><strong>🚀 Live Demo</strong></a>
 </p>
 
 ---
