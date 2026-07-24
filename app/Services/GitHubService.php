@@ -48,6 +48,20 @@ class GitHubService
         ];
     }
 
+    /**
+     * 指定ブランチの最新コミットSHAを返す。取得できなければ null。
+     * 同一コミットのレビューをキャッシュするためのキーに使う。
+     */
+    public function getLatestCommitSha(string $owner, string $repo, string $branch = 'main'): ?string
+    {
+        try {
+            $data = $this->get("/repos/{$owner}/{$repo}/commits/{$branch}");
+            return $data['sha'] ?? null;
+        } catch (\Exception) {
+            return null;
+        }
+    }
+
     public function getFileTree(string $owner, string $repo, string $branch = 'main'): array
     {
         try {

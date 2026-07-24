@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Review extends Model
 {
     protected $fillable = [
-        'github_url', 'owner', 'repo', 'branch',
+        'github_url', 'owner', 'repo', 'branch', 'commit_sha',
+        'analysis_source', 'cached_from_review_id',
         'language', 'quality_score', 'security_score',
         'maintainability_score', 'review_data', 'status',
         'progress_step', 'error_message', 'view_count',

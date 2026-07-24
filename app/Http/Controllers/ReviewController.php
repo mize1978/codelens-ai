@@ -110,8 +110,17 @@ class ReviewController extends Controller
 
     public function ranking()
     {
-        $reviews = Review::where('status', 'complete')
-            ->orderBy('view_count', 'desc')->limit(20)->get();
+        // 同一リポジトリは最新レビュー1件（最大id＝最新コミットの評価）に集約し、重複表示を防ぐ
+        $latestIds = Review::where('status', 'complete')
+            ->groupBy('owner', 'repo')
+            ->selectRaw('MAX(id) as id')
+            ->pluck('id');
+
+        $reviews = Review::whereIn('id', $latestIds)
+            ->orderByDesc('view_count')
+            ->limit(20)
+            ->get();
+
         return view('reviews.ranking', compact('reviews'));
     }
 }
