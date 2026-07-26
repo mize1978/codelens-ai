@@ -48,8 +48,9 @@ class ReviewController extends Controller
             'owner'      => $owner,
             'repo'       => $repo,
             'status'     => 'pending',
-            'ip_hash'    => hash('sha256', $request->ip()),
         ]);
+        $review->ip_hash = $ipHash;
+        $review->save();
 
         ProcessReviewJob::dispatch($review);
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app_preview')
 @section('title', $review->owner.'/'.$review->repo.' — CodeLens AI')
 
 @section('content')
@@ -418,8 +418,8 @@
 
 {{-- BACK / NAV --}}
 <div class="back-row">
-    <a href="{{ route('reviews.index') }}" class="btn-back">← 新しいレビューを開始</a>
-    <a href="{{ route('ranking') }}" class="btn-ranking">🏆 ランキング</a>
+    <a href="{{ route('preview') }}" class="btn-back">← 新しいレビューを開始</a>
+    <a href="{{ route('review.archive') }}" class="btn-ranking">📚 Review Archive</a>
     <button class="btn-share" id="btn-share" onclick="shareReview()">🔗 Share</button>
 </div>
 

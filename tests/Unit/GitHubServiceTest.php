@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Services\GitHubService;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class GitHubServiceTest extends TestCase
 {
