@@ -186,3 +186,17 @@ Released under the MIT License.
   Made with ☕ by <b>Mize</b> & <b>CodeLens-kun</b> 👑<br>
   <sub><i>LP is the entrance. Workspace is the place. Reports become books. Knowledge becomes memory.</i></sub>
 </p>
+
+---
+
+<p align="center">
+  <a href="https://codelens-ai-vplg.onrender.com/">
+    <img src="docs/images/hero.jpg" alt="CodeLensAI — Your repository remembers." width="900">
+  </a>
+</p>
+
+<h3 align="center">Your repository remembers.</h3>
+<p align="center"><sub>Repository Intelligence begins here.</sub></p>
+<p align="center">
+  <a href="https://codelens-ai-vplg.onrender.com/"><b>➡ &nbsp; Enter Workspace &nbsp; →</b></a>
+</p>
