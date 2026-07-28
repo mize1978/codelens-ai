@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/hero.jpg" alt="CodeLensAI — Your repository remembers." width="900">
+  <img src="docs/images/banner.jpg" alt="CodeLensAI — Repository Intelligence" width="900">
 </p>
 
 <h3 align="center">Read software, not just code.</h3>
