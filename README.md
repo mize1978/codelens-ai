@@ -191,12 +191,10 @@ Released under the MIT License.
 
 <p align="center">
   <a href="https://codelens-ai-vplg.onrender.com/">
-    <img src="docs/images/hero.jpg" alt="CodeLensAI — Your repository remembers." width="900">
+    <img src="docs/images/banner-footer.jpg" alt="CodeLensAI — Your repository remembers. Read → Understand → Remember → Grow." width="900">
   </a>
 </p>
 
-<h3 align="center">Your repository remembers.</h3>
-<p align="center"><sub>Repository Intelligence begins here.</sub></p>
 <p align="center">
   <a href="https://codelens-ai-vplg.onrender.com/"><b>➡ &nbsp; Enter Workspace &nbsp; →</b></a>
 </p>
