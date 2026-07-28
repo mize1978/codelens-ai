@@ -374,13 +374,14 @@
   <canvas id="particle-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
   <header class="app-header">
     <div class="logo-block">
-      <a href="{{ route('preview') }}" class="logo">
+      {{-- 🏛 ロゴ＝玄関(LP)へ戻る扉。Workspaceがホームなので、ロゴはブランドの原点へ --}}
+      <a href="https://mize1978.github.io/codelens-lp/" class="logo">
         <span class="logo-icon-wrap">
           <img src="/images/devinsight-logo.png" class="logo-icon" alt="logo">
         </span>
         <span class="logo-name">CodeLens<span>AI</span></span>
       </a>
-      <a href="https://github.com/mize1978" target="_blank" rel="noopener" class="logo-craft">crafted by Mize <span class="craft-arrow">↗</span></a>
+      <a href="https://mize1978.github.io/" target="_blank" rel="noopener" class="logo-craft">crafted by Mize <span class="craft-arrow">↗</span></a>
     </div>
     <nav class="nav">
       <a href="{{ route('articles') }}" class="{{ request()->routeIs('articles*') ? 'nav-active' : '' }}">Articles</a>

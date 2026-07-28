@@ -439,11 +439,11 @@
             </div>
         </div>
         {{-- ③ View Creator ボタン + ⑥ Opening... 演出 --}}
-        <a href="https://github.com/mize1978" target="_blank" rel="noopener" class="rf-github-btn" id="rf-github-btn">
+        <a href="https://mize1978.github.io/" target="_blank" rel="noopener" class="rf-github-btn" id="rf-github-btn">
             <img src="/images/devinsight-logo.png" class="rf-btn-logo" alt="logo">
             <span class="rf-btn-inner">
                 <span class="rf-btn-title">View Creator</span>
-                <span class="rf-btn-sub">github.com/mize1978</span>
+                <span class="rf-btn-sub">mize1978.github.io</span>
             </span>
         </a>
     </div>
@@ -815,9 +815,9 @@ if (rfBtn) {
         const titleEl = this.querySelector('.rf-btn-title');
         const subEl   = this.querySelector('.rf-btn-sub');
         const original = titleEl.textContent;
-        titleEl.textContent = 'Opening Creator Profile...';
+        titleEl.textContent = 'Opening Portfolio...';
         subEl.style.opacity = '0';
-        setTimeout(() => { window.open('https://github.com/mize1978', '_blank'); }, 220);
+        setTimeout(() => { window.open('https://mize1978.github.io/', '_blank'); }, 220);
         setTimeout(() => {
             titleEl.textContent = original;
             subEl.style.opacity = '1';
