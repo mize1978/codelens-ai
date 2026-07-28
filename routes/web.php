@@ -3,7 +3,15 @@
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/',                          [ReviewController::class, 'index'])->name('reviews.index');
+// 🏠 本館：Workspace v2 を home に（旧 v1 ランディングは /v1 展示室へ保存）
+Route::get('/', function () {
+    $popular = \App\Models\Review::where('status', 'complete')
+        ->orderBy('view_count', 'desc')->limit(6)->get();
+    return view('reviews.index_preview', compact('popular'));
+})->name('reviews.index');
+
+// 🏛 v1 展示室：旧ランディング（設計の変遷アーカイブとして保存・削除しない）
+Route::get('/v1', [ReviewController::class, 'index'])->name('legacy.v1');
 Route::post('/reviews',                  [ReviewController::class, 'store'])->name('reviews.store');
 Route::get('/reviews/{review}',          [ReviewController::class, 'show'])->name('reviews.show');
 Route::get('/reviews/{review}/status',   [ReviewController::class, 'status'])->name('reviews.status');
