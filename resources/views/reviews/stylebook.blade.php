@@ -12,6 +12,7 @@
   .sb-verse { max-width: 470px; margin: 40px auto 64px; text-align: center; }
   .sb-verse p { font-size: .9rem; line-height: 2.05; color: rgba(204,232,255,.5); margin: 0 0 20px; }
   .sb-verse p:last-child { margin-bottom: 0; }
+  .sb-verse .jp { color: #d5ecff; }
   .sb-verse .accent { color: #c3e5ff; font-style: italic; }
 
   /* index cards */
@@ -23,7 +24,7 @@
   .sb-card:hover { border-color: rgba(0,205,255,.5); box-shadow: 0 0 26px rgba(0,200,255,.10); transform: translateY(-2px); }
   .sb-num { font-size: .6rem; letter-spacing: .2em; color: rgba(0,205,255,.6); font-weight: 700; }
   .sb-name { display: block; font-size: 1rem; font-weight: 700; color: #eaf5ff; margin: 4px 0 8px; letter-spacing: .02em; }
-  .sb-tease { display: block; font-size: .78rem; line-height: 1.7; color: rgba(204,232,255,.52); font-style: italic; }
+  .sb-tease { display: block; font-size: .78rem; line-height: 1.75; color: rgba(204,232,255,.55); }
   .sb-tease .no { color: var(--red); }
   .sb-tease .yes { color: var(--green); }
 
@@ -68,24 +69,24 @@
   </header>
 
   <div class="sb-verse">
-    <p>Every interface tells a story.</p>
+    <p class="jp">すべてのインターフェースには、<br>そのプロダクトらしい「話し方」がある。</p>
     <p>Some products explain themselves.<br>Some products prove themselves.</p>
     <p class="accent">CodeLensAI tries to remember.</p>
   </div>
 
   {{-- ── index (目次) ── --}}
   <div class="sb-grid">
-    <a class="sb-card" href="#ch01"><span class="sb-num">01</span><span class="sb-name">Brand</span><span class="sb-tease">What CodeLensAI believes.</span></a>
-    <a class="sb-card" href="#ch02"><span class="sb-num">02</span><span class="sb-name">Visual Identity</span><span class="sb-tease">How it is recognized.</span></a>
-    <a class="sb-card" href="#ch03"><span class="sb-num">03</span><span class="sb-name">Color System</span><span class="sb-tease">The light it lives in.</span></a>
-    <a class="sb-card" href="#ch04"><span class="sb-num">04</span><span class="sb-name">Typography</span><span class="sb-tease">How it reads.</span></a>
-    <a class="sb-card" href="#ch05"><span class="sb-num">05</span><span class="sb-name">Voice</span><span class="sb-tease">How CodeLensAI speaks.</span></a>
-    <a class="sb-card" href="#ch06"><span class="sb-num">06</span><span class="sb-name">Motion</span><span class="sb-tease">How CodeLensAI moves.</span></a>
-    <a class="sb-card" href="#ch07"><span class="sb-num">07</span><span class="sb-name">Character</span><span class="sb-tease">How CodeLens-kun behaves.</span></a>
-    <a class="sb-card" href="#ch08"><span class="sb-num">08</span><span class="sb-name">Components</span><span class="sb-tease">The rooms it's built from.</span></a>
-    <a class="sb-card" href="#ch09"><span class="sb-num">09</span><span class="sb-name">Artwork</span><span class="sb-tease">How it is pictured.</span></a>
-    <a class="sb-card" href="#ch10"><span class="sb-num">10</span><span class="sb-name">Principles in Practice</span><span class="sb-tease">From belief to pixel.</span></a>
-    <a class="sb-card" href="#ch11"><span class="sb-num">11</span><span class="sb-name">Future</span><span class="sb-tease">Where it's headed.</span></a>
+    <a class="sb-card" href="#ch01"><span class="sb-num">01</span><span class="sb-name">Brand</span><span class="sb-tease">何を信じているか。</span></a>
+    <a class="sb-card" href="#ch02"><span class="sb-num">02</span><span class="sb-name">Visual Identity</span><span class="sb-tease">どう見分けられるか。</span></a>
+    <a class="sb-card" href="#ch03"><span class="sb-num">03</span><span class="sb-name">Color System</span><span class="sb-tease">どんな光の中にいるか。</span></a>
+    <a class="sb-card" href="#ch04"><span class="sb-num">04</span><span class="sb-name">Typography</span><span class="sb-tease">どう読ませるか。</span></a>
+    <a class="sb-card" href="#ch05"><span class="sb-num">05</span><span class="sb-name">Voice</span><span class="sb-tease">CodeLensAI は、どう話すか。</span></a>
+    <a class="sb-card" href="#ch06"><span class="sb-num">06</span><span class="sb-name">Motion</span><span class="sb-tease">なぜ、その動きなのか。</span></a>
+    <a class="sb-card" href="#ch07"><span class="sb-num">07</span><span class="sb-name">Character</span><span class="sb-tease">CodeLensくんの出演ルール。</span></a>
+    <a class="sb-card" href="#ch08"><span class="sb-num">08</span><span class="sb-name">Components</span><span class="sb-tease">どんな部屋でできているか。</span></a>
+    <a class="sb-card" href="#ch09"><span class="sb-num">09</span><span class="sb-name">Artwork</span><span class="sb-tease">どう描かれるか。</span></a>
+    <a class="sb-card" href="#ch10"><span class="sb-num">10</span><span class="sb-name">Principles in Practice</span><span class="sb-tease">思想から、実装まで。</span></a>
+    <a class="sb-card" href="#ch11"><span class="sb-num">11</span><span class="sb-name">Future</span><span class="sb-tease">これから、どこへ。</span></a>
   </div>
 
   <div class="sb-rail"><span>Full Chapters</span></div>
