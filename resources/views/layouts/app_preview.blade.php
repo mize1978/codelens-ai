@@ -391,7 +391,7 @@
     </nav>
     {{-- 📘 CodeLens の一冊 ＝ Repository Intelligence（本館）への扉。
          ボタンでもカードでもなく「本を開く」という行為。ラベルなし・ホバーで名前だけ。 --}}
-    <a href="https://mize1978.github.io/codelens-lp/archive.html" class="repo-door" aria-label="Open Repository Intelligence">
+    <a href="https://mize1978.github.io/codelens-lp/enter.html" class="repo-door" aria-label="Open Repository Intelligence">
       <span class="repo-pulse" aria-hidden="true"></span>
       <img src="/images/codelens-book.png" alt="Open Repository Intelligence">
       <span class="repo-door-tip">Open Repository Intelligence</span>
