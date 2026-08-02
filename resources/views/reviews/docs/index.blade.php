@@ -3,19 +3,25 @@
 
 @section('content')
 
-<div class="jr-sky"></div>
+<div class="ed-sky"></div>
 
-<div class="doc-wrap">
+<div class="ed-wrap">
+  <a href="{{ route('reviews.index') }}" class="ed-back">← Workspace</a>
 
   {{-- 探しに来る部屋：設計思想ではなく実装仕様 --}}
-  <header class="doc-head">
-    <div class="doc-kicker">Engineering Reference</div>
-    <h1 class="doc-title">Documentation</h1>
-    <p class="doc-lead">How CodeLensAI works.</p>
-    <p class="doc-sub">設計思想ではなく、実装仕様。<br>CodeLensAI を構成する仕組みをまとめています。</p>
+  <header class="ed-head">
+    <p class="ed-eyebrow">Engineering Reference</p>
+    <h1 class="ed-title">Documentation</h1>
+    <p class="ed-lead">How CodeLensAI works.</p>
   </header>
 
-  <div class="doc-rule"></div>
+  {{-- 一呼吸：Docs は静かに。思想ではなく仕組み --}}
+  <div class="ed-verse">
+    <p class="jp">設計思想ではなく、<br>実装の話。</p>
+    <p class="accent">How it actually works.</p>
+  </div>
+
+  <div class="ed-rail"><span>Reference</span></div>
 
   <nav class="doc-index">
     <a href="{{ route('docs.page', 'architecture') }}" class="doc-item">
@@ -30,13 +36,12 @@
       <span class="di-h">API</span><span class="di-sub">エンドポイント一覧</span></a>
   </nav>
 
-  <div class="doc-rule"></div>
-
   {{-- Docs だけは締め（余韻）を書かない。代わりの一行だけ --}}
-  <div class="doc-foot">Documentation is never finished.<br>Last updated 2026.07.26</div>
+  <div class="ed-foot">Documentation is never finished.<br>Last updated 2026.07.26</div>
 
 </div>
 
+@include('reviews._editorial')
 @include('reviews.docs._style')
 
 @endsection

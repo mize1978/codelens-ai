@@ -4,23 +4,30 @@
 @section('content')
 
 {{-- 🌌 同じ建物の中：世界(#81) を本棚の背後にも薄く残す --}}
-<div class="jr-sky"></div>
+<div class="ed-sky"></div>
 
-<div class="arc-wrap">
+<div class="ed-wrap">
+  <a href="{{ route('reviews.index') }}" class="ed-back">← Workspace</a>
 
   {{-- 部屋の扉：採点一覧ではなく Repository Memory の本棚 --}}
-  <header class="arc-head">
-    <div class="arc-kicker">Repository Memory</div>
-    <h1 class="arc-title">Review Archive</h1>
-    {{-- 館の象徴：CodeLensの蔵書。レビューが存在するときだけ現れる（空状態は司書が主役）。一冊だけ。 --}}
-    @if(($opening ?? false) || $reviews->count())
-    <img src="/images/codelens-book.png" class="arc-book" alt="CodeLens — the repository's book">
-    @endif
-    <p class="arc-lead">Every review becomes part of the repository's memory.</p>
-    <p class="arc-lead-ja">レビューは一度きりではない。<br>リポジトリの履歴として積み重なっていく。</p>
+  <header class="ed-head">
+    <p class="ed-eyebrow">Repository Memory</p>
+    <h1 class="ed-title">Review Archive</h1>
+    <p class="ed-lead">Every review becomes part of the repository's memory.</p>
   </header>
 
-  <div class="arc-rule"></div>
+  {{-- 一呼吸：レビューは一度きりではない --}}
+  <div class="ed-verse">
+    <p class="jp">レビューは、一度きりではない。<br>リポジトリの履歴として積み重なっていく。</p>
+    <p class="accent">Memory, not a score.</p>
+  </div>
+
+  {{-- 館の象徴：CodeLensの蔵書。レビューが存在するときだけ現れる（空状態は司書が主役）。一冊だけ。 --}}
+  @if(($opening ?? false) || $reviews->count())
+  <img src="/images/codelens-book.png" class="arc-book" alt="CodeLens — the repository's book">
+  @endif
+
+  <div class="ed-rail"><span>The Shelf</span></div>
 
   @php $opening = $opening ?? false; $demo = $demo ?? false; @endphp
 
@@ -132,47 +139,34 @@
 </div>
 
 <style>
-  .jr-sky{ position:fixed; inset:0; z-index:-1;
-    background:
-      radial-gradient(1100px 620px at 50% -8%, rgba(56,120,190,.14), transparent 60%),
-      radial-gradient(900px 520px at 85% 12%, rgba(120,80,190,.10), transparent 62%); }
-
-  .arc-wrap{ max-width:760px; margin:0 auto; padding:64px 24px 96px;
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif; }
-
-  .arc-head{ text-align:center; margin-bottom:30px; }
   /* 館の象徴：一冊だけ。暗背景を放射マスクでページに溶かす */
-  .arc-book{ display:block; width:min(158px,44%); height:auto; margin:16px auto 20px; }
-  .arc-kicker{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#6b7488; margin-bottom:14px; }
-  .arc-title{ font-size:clamp(30px,5vw,40px); font-weight:700; color:#e8edf5; margin:0 0 16px; letter-spacing:-.5px; }
-  .arc-lead{ font-size:15px; color:#8792a6; margin:0 0 10px; letter-spacing:.2px; }
-  .arc-lead-ja{ font-size:14px; line-height:1.8; color:#9aa4b8; margin:0; }
+  .arc-book{ display:block; width:min(150px,42%); height:auto; margin:2px auto 30px; }
 
-  .arc-rule{ height:1px; background:rgba(255,255,255,.09); margin:0 0 18px; }
   .arc-shelf{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
-  .arc-count{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#4d5568; }
-  .arc-order{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#4d5568; }
+  .arc-count{ font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(204,232,255,.4); }
+  .arc-order{ font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(204,232,255,.4); }
 
   .arc-list{ display:flex; flex-direction:column; }
-  .arc-item{ display:flex; align-items:center; gap:20px; padding:20px 6px; text-decoration:none;
-    border-bottom:1px solid rgba(255,255,255,.06); transition:transform .2s ease, padding-left .2s ease; }
+  .arc-item{ display:flex; align-items:center; gap:20px; padding:22px 6px; text-decoration:none;
+    border-bottom:1px solid rgba(0,200,255,.08); transition:transform .2s ease, padding-left .2s ease; }
+  .arc-item:last-child{ border-bottom:none; }
   .arc-item:hover{ transform:translateX(2px); padding-left:12px; }
 
-  .arc-score{ flex:0 0 62px; font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; letter-spacing:-1px; }
-  .arc-score i{ font-style:normal; font-size:11px; color:#4d5568; font-weight:400; margin-left:1px; }
+  .arc-score{ flex:0 0 62px; font-size:26px; font-weight:700; letter-spacing:-1px; }
+  .arc-score i{ font-style:normal; font-size:11px; color:rgba(204,232,255,.35); font-weight:400; margin-left:1px; }
 
   .arc-main{ flex:1; min-width:0; }
-  .arc-repo{ font-size:16px; font-weight:600; color:#e8edf5; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .arc-repo span{ color:#4d5568; margin:0 2px; font-weight:400; }
+  .arc-repo{ font-size:16px; font-weight:600; color:#eaf5ff; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .arc-repo span{ color:rgba(204,232,255,.35); margin:0 2px; font-weight:400; }
   .arc-item:hover .arc-repo{ color:#fff; }
-  .arc-verdict{ font-size:13px; line-height:1.55; color:#8792a6; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .arc-verdict{ font-size:13px; line-height:1.55; color:rgba(204,232,255,.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
   .arc-meta{ flex:0 0 auto; display:flex; align-items:center; gap:14px; }
-  .arc-date{ font-family:'JetBrains Mono',monospace; font-size:12px; color:#5b6474; }
-  .arc-open{ font-family:'JetBrains Mono',monospace; font-size:14px; color:#38bdf8; opacity:0; transform:translateX(-6px); transition:opacity .2s ease, transform .2s ease; }
+  .arc-date{ font-size:12px; color:rgba(204,232,255,.4); }
+  .arc-open{ font-size:14px; color:var(--cyan); opacity:0; transform:translateX(-6px); transition:opacity .2s ease, transform .2s ease; }
   .arc-item:hover .arc-open{ opacity:1; transform:translateX(0); }
 
-  .arc-empty{ text-align:center; padding:56px 0; }
+  .arc-empty{ text-align:center; padding:40px 0 20px; }
   {{-- 司書：待つ→受け取る→席に戻る。棚<司書・接地影・マスクで暗背景を溶かす --}}
   .arc-lib{ position:relative; width:min(342px,78%); margin:0 auto 24px; max-height:700px;
     transition:max-height .6s ease, opacity .5s ease, margin .6s ease; }
@@ -187,18 +181,20 @@
   .arc-recv{ -webkit-mask-image:none !important; mask-image:none !important; width:86%; margin:0 auto; }
   #recText{ transition:opacity .45s ease; }
   .arc-firstbook{ margin-top:28px; text-align:left;
-    border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);
+    border-top:1px solid rgba(0,200,255,.08); border-bottom:1px solid rgba(0,200,255,.08);
     transition:opacity .55s ease, transform .55s ease; }
   .arc-firstbook.is-off{ transform:translateY(14px); }
   .is-off{ opacity:0 !important; }
-  .arc-empty-en{ font-size:16px; color:#9aa4b8; margin:0 0 10px; }
-  .arc-empty-sub{ font-family:'JetBrains Mono',monospace; font-size:12.5px; letter-spacing:.5px; color:#7d8aa0; margin:0 0 16px; }
-  .arc-empty-ja{ font-size:13px; color:#5b6474; margin:0; }
+  .arc-empty-en{ font-size:16px; color:rgba(204,232,255,.6); margin:0 0 10px; }
+  .arc-empty-sub{ font-size:12.5px; letter-spacing:.5px; color:rgba(0,205,255,.6); margin:0 0 16px; }
+  .arc-empty-ja{ font-size:13px; color:rgba(204,232,255,.4); margin:0; }
 
   @media (max-width:560px){
     .arc-verdict{ display:none; }
     .arc-score{ flex-basis:52px; font-size:22px; }
   }
 </style>
+
+@include('reviews._editorial')
 
 @endsection
