@@ -387,6 +387,7 @@
       <a href="{{ route('articles') }}" class="{{ request()->routeIs('articles*') ? 'nav-active' : '' }}">Articles</a>
       <a href="{{ route('review.archive') }}" class="{{ request()->routeIs('review.archive') || request()->routeIs('reviews.show') ? 'nav-active' : '' }}">Reviews</a>
       <a href="{{ route('docs') }}" class="{{ request()->routeIs('docs*') ? 'nav-active' : '' }}">Docs</a>
+      <a href="{{ route('stylebook') }}" class="{{ request()->routeIs('stylebook*') ? 'nav-active' : '' }}">StyleBook</a>
     </nav>
     {{-- 📘 CodeLens の一冊 ＝ Repository Intelligence（本館）への扉。
          ボタンでもカードでもなく「本を開く」という行為。ラベルなし・ホバーで名前だけ。 --}}

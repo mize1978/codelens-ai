@@ -25,6 +25,11 @@ Route::get('/preview', function () {
     return view('reviews.index_preview', compact('popular'));
 })->name('preview');
 
+// 🎨 StyleBook — Workspace の編集部・目次（各章ティーザー → 全文）
+Route::get('/preview/stylebook', function () {
+    return view('reviews.stylebook');
+})->name('preview.stylebook');
+
 // 🛸 preview 専用：in-place Analyze（本物のjobを発火してJSONでidを返す。本番storeは無傷）
 Route::post('/preview/analyze', function (\Illuminate\Http\Request $request) {
     $request->validate(['github_url' => 'required|string|max:500']);
@@ -115,6 +120,9 @@ Route::get('/reviews', function (\Illuminate\Http\Request $request) {
 
 // 📘 Docs フロア＝Engineering Reference（実装仕様。「読ませる部屋」でなく「探しに来る部屋」）。
 Route::get('/docs', fn () => view('reviews.docs.index'))->name('docs');
+
+// 🎨 StyleBook — 公開ルート（Workspace 編集部・DOCS と同格）
+Route::get('/stylebook', fn () => view('reviews.stylebook'))->name('stylebook');
 Route::get('/docs/{page}', function (string $page) {
     abort_unless(in_array($page, ['architecture', 'repository-memory', 'prompt-design', 'scoring', 'api'], true), 404);
     return view('reviews.docs.' . $page);
