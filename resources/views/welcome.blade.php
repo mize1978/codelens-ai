@@ -219,5 +219,14 @@
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
         @endif
-    </body>
+        {{-- Console Easter Egg --}}
+    <script>
+      console.log(
+        "%c 🔍 CodeLensAI %c built by mize ",
+        "background:#2563eb;color:#fff;font-size:13px;font-weight:bold;padding:5px 10px;border-radius:6px 0 0 6px;",
+        "background:#0f172a;color:#93c5fd;font-size:13px;font-weight:bold;padding:5px 10px;border-radius:0 6px 6px 0;"
+      );
+      console.log("%c ✦ github.com/mize1978/codelens-ai", "color:#2563eb;font-size:11px;padding-left:2px;");
+    </script>
+</body>
 </html>
