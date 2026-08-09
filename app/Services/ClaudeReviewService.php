@@ -53,6 +53,53 @@ SYS;
     }
 
     /**
+     * 採点 rubric を Repository Facts / Evidence Coverage に連動させる最終判定ブロック。
+     * 静的な採点基準（「テストが存在しない -15」等）を Facts で上書きする:
+     *   - tests=none のときだけ tests 減点を allowed、それ以外(detected/unknown)は blocked
+     *   - validation は確認できない（validations=unknown / 対象 truncated）なら blocked
+     * ＝「存在確認できたもの／確認できないもの」は減点せず、本当に不在(none)のときだけ減点。
+     */
+    public function buildScoringRubric(array $facts, array $coverage): string
+    {
+        $testsStatus      = $facts['tests']['status'] ?? 'unknown';
+        $validationStatus = $facts['validations']['status'] ?? 'unknown';
+
+        if ($testsStatus === 'none') {
+            $testsLine = 'tests_deduction: allowed  （tests=none：探索の上で不在を確認。「テストが存在しない … -15」を適用してよい）';
+        } else {
+            $why       = $testsStatus === 'detected' ? '存在確認済み' : '未確認';
+            $testsLine = "tests_deduction: blocked  （tests={$testsStatus}：{$why}。「テストが存在しない … -15」を適用してはならない）";
+        }
+
+        $anyTruncated = false;
+        foreach ($coverage['files'] ?? [] as $file) {
+            if (!empty($file['truncated'])) {
+                $anyTruncated = true;
+                break;
+            }
+        }
+
+        if ($validationStatus === 'none' && !$anyTruncated) {
+            $validationLine = 'validation_deduction: allowed  （validations=none：確認の上で不在。「入力バリデーションの欠如 … -15」を適用してよい）';
+        } else {
+            $reason = match (true) {
+                $validationStatus === 'detected' => '存在確認済み',
+                $anyTruncated                    => '対象ファイルが truncated で確認不能',
+                default                          => 'validations=unknown で確認不能',
+            };
+            $validationLine = "validation_deduction: blocked  （{$reason}。「入力バリデーションの欠如 … -15」を断定・適用してはならない）";
+        }
+
+        return <<<RUBRIC
+【採点の最終判定（Repository Facts 連動・上記の静的採点基準より優先）】
+Repository Facts / Evidence Coverage を採点の最終根拠とする。静的な採点基準と矛盾する場合は、必ず Repository Facts を優先すること（unknown を none として扱わない・確認できないものを不在として減点しない）。
+
+- {$testsLine}
+- {$validationLine}
+RUBRIC;
+    }
+
+    /**
      * 既存レビュープロンプトの冒頭に、Repository Facts / Evidence Coverage /
      * Context Contract を前置する。既存の buildReviewPrompt() を再利用し、
      * 巨大プロンプトを複製しない（context を組み立て → 既存 prompt と合成）。
@@ -66,7 +113,9 @@ SYS;
     ): string {
         return $this->contextBlock($facts, $coverage)
             . "\n\n"
-            . $this->buildReviewPrompt($owner, $repo, $files);
+            . $this->buildReviewPrompt($owner, $repo, $files)
+            . "\n\n"
+            . $this->buildScoringRubric($facts->toArray(), $coverage->toArray());
     }
 
     /** facts / coverage / contract を、コード抜粋より前に置くための前置ブロック */
