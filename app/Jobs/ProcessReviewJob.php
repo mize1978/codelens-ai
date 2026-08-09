@@ -71,7 +71,7 @@ class ProcessReviewJob implements ShouldQueue
             }
 
             $review->update(['progress_step' => 'analyzing']);
-            $data = $claude->review($review->owner, $review->repo, $files);
+            $data = $claude->review($review->owner, $review->repo, $files, $tree, 3000);
 
             $review->update(['progress_step' => 'generating_report']);
             $data['github_stats']      = $stats;
