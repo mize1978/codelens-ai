@@ -33,6 +33,69 @@ SYS;
         return $this->parseJson($text, $this->defaultReview());
     }
 
+    /**
+     * 既存レビュープロンプトの冒頭に、Repository Facts / Evidence Coverage /
+     * Context Contract を前置する。既存の buildReviewPrompt() を再利用し、
+     * 巨大プロンプトを複製しない（context を組み立て → 既存 prompt と合成）。
+     */
+    public function buildReviewPromptWithContext(
+        string $owner,
+        string $repo,
+        array $files,
+        RepositoryFacts $facts,
+        EvidenceCoverage $coverage
+    ): string {
+        return $this->contextBlock($facts, $coverage)
+            . "\n\n"
+            . $this->buildReviewPrompt($owner, $repo, $files);
+    }
+
+    /** facts / coverage / contract を、コード抜粋より前に置くための前置ブロック */
+    private function contextBlock(RepositoryFacts $facts, EvidenceCoverage $coverage): string
+    {
+        $factsJson = json_encode($facts->toArray(), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+        $cov = $coverage->toArray();
+        $fileLines = '';
+        foreach ($cov['files'] as $path => $c) {
+            $flag = $c['truncated'] ? 'true' : 'false';
+            $fileLines .= "- {$path}: read_chars={$c['read_chars']} / total_chars={$c['total_chars']} / truncated={$flag}\n";
+        }
+        $mode  = $cov['coverage_mode'];
+        $total = $cov['total_files'];
+        $sel   = $cov['selected_files'];
+
+        return <<<CTX
+以下はこのレビューの前提です。コード抜粋より先に、必ず次の2つを踏まえて判断してください。
+
+<context_contract>
+情報の優先順位（この順に信頼すること）:
+1. Repository Facts  — 静的解析で機械的に確認済みの事実。最優先。
+2. Evidence Coverage — 今回あなたが実際に読めた範囲（subset / truncated）。
+3. Code excerpts     — 上記の範囲から推論するための材料。最後。
+
+判断ルール:
+- 各 fact の status は detected / none / unknown を厳密に区別する
+  （detected=確認済み / none=十分探索した上での不在 / unknown=未確認）。
+  unknown を none として扱ってはならない（unknown != none）。
+- deep-read はリポジトリ全体の subset である。未選択ファイルに見えないことを根拠に
+  「存在しない」と断定してはならない。
+- truncated なファイルは全文を読めていない。表示範囲に見えないことだけを根拠に
+  「その定義・機能は存在しない」と断定してはならない。
+- Repository Facts と、コード抜粋からの推論が矛盾する場合は、必ず Repository Facts を
+  優先する（例: facts で tests=detected なら「テストが無い」と判断してはならない）。
+</context_contract>
+
+<repository_facts>
+{$factsJson}
+</repository_facts>
+
+<evidence_coverage>
+coverage_mode: {$mode}  (total_files={$total} / selected_files={$sel})
+{$fileLines}</evidence_coverage>
+CTX;
+    }
+
     public function fixIssue(string $issueTitle, string $issueDesc, array $files): array
     {
         $issueTitle = $this->sanitizeInput($issueTitle);
