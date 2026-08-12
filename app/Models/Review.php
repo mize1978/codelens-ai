@@ -42,4 +42,19 @@ class Review extends Model
         if ($score >= 40) return '#ffaa00';
         return '#ff4466';
     }
+
+    /**
+     * カード用の「CodeLens の一言」抜粋。保存済みの one_line_verdict を使い（新規 API 呼び出しなし）、
+     * 長い場合は文字数基準で省略する。詳細ページで全文を見せる導線にする。
+     */
+    public function verdictExcerpt(int $limit = 80): ?string
+    {
+        $v = $this->review_data['one_line_verdict'] ?? null;
+        if (! is_string($v) || trim($v) === '') {
+            return null;
+        }
+        $v = trim($v);
+
+        return mb_strlen($v) <= $limit ? $v : mb_substr($v, 0, $limit) . '…';
+    }
 }
