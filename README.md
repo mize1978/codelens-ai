@@ -7,6 +7,10 @@
 <p align="center"><sub>Repository Intelligence begins here. &nbsp;·&nbsp; <b>Read → Understand → Remember → Grow</b></sub></p>
 
 <p align="center">
+  <b>English</b> &nbsp;·&nbsp; <a href="README.ja.md">日本語</a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Laravel-FF2D20?style=flat&logo=laravel&logoColor=white" alt="Laravel">
   <img src="https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
@@ -21,7 +25,7 @@
   &nbsp;·&nbsp;
   <a href="https://mize1978.github.io/codelens-lp/archive.html"><b>📚 Archive</b></a>
   &nbsp;·&nbsp;
-  <a href="https://glaze-turn-b67.notion.site/Development-Journal-3a0d9f65223b81c5acaff8a6a09cf9c0"><b>📘 Development Journal</b></a>
+  <a href="https://mize1978.github.io/codelens-lp/journal-vol01.html"><b>📘 Development Journal</b></a>
   &nbsp;·&nbsp;
   <a href="https://mize1978.github.io/"><b>👤 Portfolio</b></a>
 </p>
@@ -133,7 +137,7 @@ written — a new page every time the product grows.
 <p align="center"><sub><b>CURRENTLY READING · VOL.01 — “Workspace became home.”</b></sub></p>
 
 <p align="center">
-  <a href="https://glaze-turn-b67.notion.site/Development-Journal-3a0d9f65223b81c5acaff8a6a09cf9c0"><b>→ Read the Development Journal</b></a>
+  <a href="https://mize1978.github.io/codelens-lp/journal-vol01.html"><b>→ Read the Development Journal</b></a>
 </p>
 
 ---
