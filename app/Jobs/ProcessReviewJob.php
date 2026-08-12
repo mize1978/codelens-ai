@@ -58,6 +58,19 @@ class ProcessReviewJob implements ShouldQueue
                 }
             }
 
+            // レビュー回数ガード（キャッシュヒットは上で return 済み＝ここは Claude を呼ぶ経路）。
+            // 上限なら Claude を呼ばず 'limited' として停止し、カウント対象('generated')から外す。
+            $gate = app(\App\Services\ReviewRateLimiter::class)->check((string) $review->ip_hash, $review->id);
+            if (! $gate['allowed']) {
+                $review->update([
+                    'status'          => 'failed',
+                    'progress_step'   => null,
+                    'analysis_source' => 'limited',
+                    'error_message'   => app(\App\Services\ReviewRateLimiter::class)->message(),
+                ]);
+                return;
+            }
+
             $tree   = $github->getFileTree($review->owner, $review->repo, $branch);
             $paths  = $github->selectKeyFiles($tree);
 
