@@ -876,7 +876,7 @@
     if(insightBox){
       if(d.insight){
         var ix=d.insight.indexOf('。');
-        if(ix>0 && ix<d.insight.length-1){ insightEl.innerHTML=''; var b=document.createElement('strong'); b.textContent=d.insight.slice(0,ix+1); insightEl.appendChild(b); var rest=document.createElement('span'); rest.className='insight-rest'; rest.textContent=d.insight.slice(ix+1).replace(/^\s+/,''); insightEl.appendChild(rest); } /* 一文目＝リード → 息継ぎ → 残り（AI文は無改変・表示だけで2文に）*/
+        if(ix>0 && ix<d.insight.length-1){ insightEl.innerHTML=''; var b=document.createElement('strong'); b.textContent=d.insight.slice(0,ix+1); insightEl.appendChild(b); var restSpan=document.createElement('span'); restSpan.className='insight-rest'; restSpan.textContent=d.insight.slice(ix+1).replace(/^\s+/,''); insightEl.appendChild(restSpan); } /* 一文目＝リード → 息継ぎ → 残り（AI文は無改変・表示だけで2文に）*/
         else { insightEl.textContent=d.insight; }
         insightBox.style.display='';
       } else { insightBox.style.display='none'; }
