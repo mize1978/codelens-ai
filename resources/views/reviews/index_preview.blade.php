@@ -341,6 +341,13 @@
             <span style="color:{{ $i <= $stars ? '#ffcc00' : 'rgba(255,255,255,0.15)' }}">★</span>
           @endfor
         </div>
+        @php $verdict = $review->verdictExcerpt(78); @endphp
+        @if($verdict)
+        <div class="pc-says">
+          <span class="pc-says-label">CodeLens says</span>
+          <span class="pc-says-text">{{ $verdict }}</span>
+        </div>
+        @endif
         <div class="pc-tags">
           @if($lang)<span class="pc-tag">{{ $lang }}</span>@endif
           @if($fw && $fw !== 'Unknown' && $fw !== 'なし')<span class="pc-tag">{{ $fw }}</span>@endif
@@ -511,6 +518,10 @@
   color: var(--text-dim); font-weight: 600; letter-spacing: 0.05em;
 }
 .pc-views { background: transparent; border-color: transparent; color: var(--text-mute); }
+.pc-says { margin: 2px 0 9px; }
+.pc-says-label { display:block; font-size:0.55rem; letter-spacing:0.14em; text-transform:uppercase; color:rgba(0,200,255,0.8); font-weight:700; margin-bottom:3px; }
+.pc-says-text { font-size:0.74rem; line-height:1.5; color:rgba(235,240,255,0.92);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 
 /* ===== CodeLens Library ===== */
 .library-section {
