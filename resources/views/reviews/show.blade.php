@@ -447,6 +447,10 @@
             </span>
         </a>
     </div>
+    {{-- #7 Public Archive Safety ⑤: 第三者repoも解析できるため、所有者の投稿・承認ではないことを明示 --}}
+    <p class="rf-disclaimer" style="margin-top:14px;font-size:0.62rem;line-height:1.6;color:var(--text-mute);letter-spacing:0.02em">
+        本レビューは CodeLensAI による自動解析結果であり、リポジトリ所有者による投稿・承認を意味しません。公開リポジトリを対象に生成され、公開アーカイブに保存されます。
+    </p>
 </div>
 
 {{-- ===== FAILED STATE ===== --}}

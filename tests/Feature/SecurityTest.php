@@ -2,10 +2,14 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SecurityTest extends TestCase
 {
+    // `/` の参照や status エンドポイントの insert のためスキーマを保証（:memory: 順序依存の既存不具合の修正）
+    use RefreshDatabase;
+
     public function test_security_headers_present_on_all_responses(): void
     {
         $response = $this->get('/');

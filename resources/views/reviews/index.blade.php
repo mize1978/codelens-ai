@@ -48,7 +48,7 @@
           </button>
         </div>
         <p style="font-size:0.65rem;color:var(--text-mute);margin-top:8px">
-          ※ GitHubトークン設定で大きなリポジトリや非公開リポジトリにも対応可
+          ※ 公開リポジトリのみ対応。レビュー結果は公開アーカイブに保存され、誰でも閲覧できます。
         </p>
       </form>
     </div>

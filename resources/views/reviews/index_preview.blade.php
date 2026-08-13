@@ -64,6 +64,7 @@
         <button class="analyze" id="go">Analyze</button>
       </div>
       <div class="hint">パブリックリポジトリを解析します。平均 <b>~8s</b>。</div>
+      <div class="hint" style="opacity:.72">🔓 レビュー結果は公開アーカイブ（<b>Reviews</b>）に保存され、誰でも閲覧できます。</div>
       <div class="chips">
         <span class="chip" data-repo="github.com/mize1978/rewardme">rewardme</span>
         <span class="chip" data-repo="github.com/mize1978/debugme">debugme</span>
