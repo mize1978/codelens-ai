@@ -43,6 +43,34 @@ class ReviewController extends Controller
             return back()->withErrors(['github_url' => '有効なGitHub URLを入力してください'])->withInput();
         }
 
+        // #7 Public Archive Safety: レビュー結果は公開Archiveに恒久保存されるため、
+        // public repository のみ受け付ける。private/存在しないrepoは解析開始前に拒否する。
+        // ただし GitHub 側の一時障害（レート制限・5xx・ネットワーク）を「非公開」と誤表示しない。
+        try {
+            $info = $this->github->getRepoInfo($owner, $repo);
+        } catch (\Throwable $e) {
+            $status = 0;
+            if (preg_match('/GitHub API error:\s*(\d{3})/', $e->getMessage(), $m)) {
+                $status = (int) $m[1];
+            }
+            // 404 = 見つからない、またはアクセス権のない private ＝ ユーザー起因として拒否
+            if ($status === 404) {
+                return back()->withErrors(['github_url' => 'リポジトリが見つからないか、公開されていません。CodeLensAI は Public Repository のみ対応しています。'])->withInput();
+            }
+            // それ以外（403 レート制限 / 5xx / 接続断など）は一時障害。原因をログに残し、"非公開" とは別メッセージで案内する。
+            \Illuminate\Support\Facades\Log::warning('CodeLens: repository visibility check failed (transient)', [
+                'owner'  => $owner,
+                'repo'   => $repo,
+                'status' => $status,
+                'error'  => $e->getMessage(),
+            ]);
+            return back()->withErrors(['github_url' => 'GitHub に一時的に接続できませんでした。少し時間をおいて再度お試しください。'])->withInput();
+        }
+
+        if (($info['private'] ?? false) === true) {
+            return back()->withErrors(['github_url' => 'CodeLensAI の公開レビューは Public Repository のみ対応しています。非公開リポジトリはレビューできません。'])->withInput();
+        }
+
         $review = Review::create([
             'github_url' => "https://github.com/{$owner}/{$repo}",
             'owner'      => $owner,

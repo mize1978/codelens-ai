@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Jobs\ProcessReviewJob;
 use App\Models\Review;
+use App\Services\GitHubService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
@@ -46,6 +47,12 @@ class ReviewControllerTest extends TestCase
     public function test_store_dispatches_job_for_valid_url(): void
     {
         Queue::fake();
+
+        // #7: store() は public 判定のため getRepoInfo を呼ぶ。テストはネットワークに出さず public を返す。
+        $this->partialMock(GitHubService::class, function ($mock) {
+            $mock->shouldReceive('getRepoInfo')->andReturn(['private' => false]);
+        });
+
         $this->post('/reviews', ['github_url' => 'https://github.com/laravel/framework'])
              ->assertRedirect();
 
@@ -55,6 +62,66 @@ class ReviewControllerTest extends TestCase
             'repo'   => 'framework',
             'status' => 'pending',
         ]);
+    }
+
+    /** #7 Public Archive Safety ②: private repo は解析開始前に拒否（公開Archiveに載せない） */
+    public function test_store_rejects_private_repository_before_analysis(): void
+    {
+        Queue::fake();
+
+        // GitHub API が private=true を返す状況。parseUrl は本物のまま。
+        $this->partialMock(GitHubService::class, function ($mock) {
+            $mock->shouldReceive('getRepoInfo')->andReturn(['private' => true]);
+        });
+
+        $this->post('/reviews', ['github_url' => 'https://github.com/mize1978/secret-private'])
+             ->assertSessionHasErrors('github_url');
+
+        // 拒否なので Review は作られず、解析ジョブも発火しない
+        $this->assertDatabaseCount('reviews', 0);
+        Queue::assertNotPushed(ProcessReviewJob::class);
+    }
+
+    /** #7 Public Archive Safety ③: 存在しない／アクセス不能 repo（404等）も適切に拒否 */
+    public function test_store_rejects_inaccessible_repository(): void
+    {
+        Queue::fake();
+
+        // getRepoInfo が 404 相当で例外を投げる状況
+        $this->partialMock(GitHubService::class, function ($mock) {
+            $mock->shouldReceive('getRepoInfo')
+                 ->andThrow(new \RuntimeException('GitHub API error: 404 for /repos/ghost/nope'));
+        });
+
+        $this->post('/reviews', ['github_url' => 'https://github.com/ghost/nope'])
+             ->assertSessionHasErrors('github_url');
+
+        $this->assertDatabaseCount('reviews', 0);
+        Queue::assertNotPushed(ProcessReviewJob::class);
+    }
+
+    /** #7 Public Archive Safety: GitHub の一時障害（レート制限/5xx）を「非公開」と誤表示しない */
+    public function test_store_treats_github_outage_as_transient_not_private(): void
+    {
+        Queue::fake();
+
+        // 403（レート制限相当）で例外。private ではなく一時障害。
+        $this->partialMock(GitHubService::class, function ($mock) {
+            $mock->shouldReceive('getRepoInfo')
+                 ->andThrow(new \RuntimeException('GitHub API error: 403 for /repos/some/repo'));
+        });
+
+        $this->post('/reviews', ['github_url' => 'https://github.com/some/repo'])
+             ->assertSessionHasErrors('github_url');
+
+        // 一時障害でも公開Archiveには載せない
+        $this->assertDatabaseCount('reviews', 0);
+        Queue::assertNotPushed(ProcessReviewJob::class);
+
+        // メッセージは「一時的」と案内し、"非公開"/"Public" と誤認させない
+        $message = implode(' ', session('errors')->get('github_url'));
+        $this->assertStringContainsString('一時的', $message);
+        $this->assertStringNotContainsString('非公開', $message);
     }
 
     public function test_store_enforces_daily_rate_limit(): void
