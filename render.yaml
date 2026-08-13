@@ -3,7 +3,7 @@ services:
     name: codelens-ai
     runtime: docker
     plan: free
-    healthCheckPath: /
+    healthCheckPath: /up
     envVars:
       - key: APP_ENV
         value: production
