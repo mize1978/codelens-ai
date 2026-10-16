@@ -15,7 +15,7 @@
   .workspace-copy p{font:14px/2 -apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;color:#a9b8d5}
   .workspace-signature{display:flex;align-items:center;gap:12px;margin-top:28px;color:#8ea4d0;font:10px 'JetBrains Mono',monospace}
   .workspace-signature::before{content:'';width:35px;height:1px;background:#768fff}
-  .workspace-scene{height:490px;position:relative;background:url('/images/cl-main.png') center top/310px 450px no-repeat}
+  .workspace-scene{height:490px;position:relative;background:url('/images/codelens-idle.png') center top/310px 450px no-repeat}
   .workspace-orbit{width:390px;height:390px;border-radius:50%;border:1px solid #6275d666;position:absolute;top:20px;left:50%;transform:translateX(-50%);box-shadow:0 0 100px #4c52f61c,inset 0 0 80px #5173ff0d}
   .workspace-orbit::before{content:'';position:absolute;inset:18px;border-radius:50%;border:1px dashed #6a8ded55}
   .workspace-orbit::after{content:'⌖';color:#8ecfff;font-size:35px;position:absolute;top:34px;right:25px}
@@ -44,7 +44,7 @@
     </div>
     <div class="workspace-scene" aria-label="CodeLensくんの解析デスク">
       <div class="workspace-orbit"></div><div class="workspace-base"></div>
-      <img class="workspace-mascot" src="/images/cl-main.png" alt="虫眼鏡を持ったCodeLensくん">
+      <img class="workspace-mascot" src="/images/codelens-idle.png" alt="本を読むCodeLensくん">
       <div class="workspace-float workspace-code"><b>REPOSITORY / SOURCE</b><br><span>class</span> YourRepository<br>&nbsp; def next_chapter<br>&nbsp;&nbsp; <span>read</span> · understand<br>&nbsp; end<br>end</div>
       <div class="workspace-float workspace-reading"><b>THE READING LENS</b><br><i></i>QUALITY<br><i></i>SECURITY<br><i></i>MAINTAINABILITY</div>
       <div class="workspace-speech">「さて、読ませてもらおう。」</div>
