@@ -34,6 +34,7 @@
       --glow-c:  0 0 20px rgba(0,200,255,0.35), 0 0 40px rgba(0,200,255,0.1);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--bg); scrollbar-gutter: stable; }
     body {
       background: var(--bg); color: var(--text);
       font-family: 'JetBrains Mono', monospace;
@@ -44,6 +45,28 @@
       background: repeating-linear-gradient(0deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
     }
     a { color: inherit; text-decoration: none; }
+
+    /* Same-origin pages share one continuous room instead of flashing between documents. */
+    @view-transition { navigation: auto; }
+    .app-header { view-transition-name: codelens-header; }
+    .shared-stars { view-transition-name: codelens-stars; }
+    main { view-transition-name: codelens-page; }
+    ::view-transition-old(codelens-header),
+    ::view-transition-new(codelens-header),
+    ::view-transition-old(codelens-stars),
+    ::view-transition-new(codelens-stars) { animation: none; }
+    ::view-transition-old(codelens-page) { animation: codelens-page-out 130ms ease-in both; }
+    ::view-transition-new(codelens-page) { animation: codelens-page-in 220ms cubic-bezier(.2,.75,.25,1) both; }
+    @keyframes codelens-page-out {
+      to { opacity: 0; transform: translateY(-3px); }
+    }
+    @keyframes codelens-page-in {
+      from { opacity: 0; transform: translateY(5px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-old(codelens-page),
+      ::view-transition-new(codelens-page) { animation: none; }
+    }
 
     /* Header */
     .app-header {
@@ -461,6 +484,23 @@
     @yield('content')
   </main>
 <script>
+// Internal navigation is prefetched on intent so the next room is ready before the click.
+(function () {
+  const prefetched = new Set();
+  function prefetch(link) {
+    if (!link || !link.href || link.target === '_blank' || link.hasAttribute('download')) return;
+    const url = new URL(link.href, location.href);
+    if (url.origin !== location.origin || url.pathname === location.pathname || prefetched.has(url.href)) return;
+    prefetched.add(url.href);
+    const hint = document.createElement('link');
+    hint.rel = 'prefetch';
+    hint.href = url.href;
+    document.head.appendChild(hint);
+  }
+  document.addEventListener('pointerover', function (event) { prefetch(event.target.closest('a')); }, { passive: true });
+  document.addEventListener('touchstart', function (event) { prefetch(event.target.closest('a')); }, { passive: true });
+})();
+
 // CodeLens Status Controller
 window.CodeLensStatus = (function () {
   const pill     = document.getElementById('cl-status');
