@@ -367,10 +367,56 @@
       85%  { transform: rotate(360deg); opacity: 0.7; }
       100% { transform: rotate(400deg); opacity: 0; }
     }
+
+    /* Workspace / review / docs share one analysis-desk world. */
+    html { min-height: 100%; background: #060917; }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 65% 47%, #202b7259, transparent 55%),
+        radial-gradient(ellipse at 30% 100%, #23388b66, transparent 60%),
+        #060917;
+      background-attachment: fixed;
+      isolation: isolate;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 80px 0 0; z-index: -2; pointer-events: none;
+      background-image: linear-gradient(#1d39751f 1px, transparent 1px), linear-gradient(90deg, #1d39751f 1px, transparent 1px);
+      background-size: 70px 70px; mask-image: linear-gradient(transparent, #000);
+    }
+    #particle-canvas { display: none; }
+    .shared-stars {
+      position: fixed; inset: 80px 0 0; z-index: -1; pointer-events: none;
+      background-image: radial-gradient(circle, #86c9ff99 1px, transparent 2px);
+      background-size: 127px 109px; mask-image: linear-gradient(#000, transparent);
+    }
+    .app-header {
+      height: 80px; padding: 0 5vw; background: #080b1c; border-bottom-color: #263457;
+      backdrop-filter: none; position: relative;
+    }
+    .logo { animation: none; }
+    .logo-name { font-size: 1.42rem; }
+    .nav { gap: 28px; top: auto; }
+    .nav a { font-size: .69rem; letter-spacing: .18em; }
+    .repo-door { width: auto; height: 52px; border: 0; border-radius: 0; background: none; box-shadow: none; gap: 9px; padding: 0; margin: 0; }
+    .repo-door img { width: auto; height: 46px; }
+    .repo-door-tip {
+      position: static; display: inline; opacity: 1; transform: none; white-space: nowrap;
+      font: 11px/1 system-ui, sans-serif; color: #ecf2ff; background: none; border: 0; padding: 0; pointer-events: auto;
+    }
+    .repo-door-tip::after { content: ' ↗'; position: static; background: none; }
+    .status-pill { font-size: .64rem; }
+    @media (max-width: 900px) {
+      .app-header { height: 70px; padding: 0 20px; }
+      .nav, .status-pill { display: none; }
+      .repo-door { margin-left: auto; }
+      .repo-door-tip { font-size: 10px; }
+    }
   </style>
   @yield('head')
 </head>
 <body>
+  <div class="shared-stars" aria-hidden="true"></div>
   <canvas id="particle-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
   <header class="app-header">
     <div class="logo-block">

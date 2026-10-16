@@ -3,51 +3,55 @@
 
 @section('content')
 
-{{-- 🌌 sky: 世界(#81) を部屋の背後にずっと残す ── モックの .sky --}}
-<div class="sky"></div>
-
-{{-- 🚪 portal: 入口の演出(~1.25s) → 消える ── モックの .portal（LP CTA → this → the room, one door）--}}
-<div class="portal" id="portal">
-  <div class="portal-sweep"></div>
-  <div class="portal-word">Repository Intelligence</div>
-</div>
 <style>
-  .sky{position:fixed; inset:0; z-index:0; pointer-events:none; background:#05070f}
-  .sky::before{content:""; position:absolute; inset:0; background-image:url("/images/hero-entrance.jpg"); background-size:cover; background-position:center 20%; opacity:.30; filter:saturate(.95)}
-  .sky::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,14,20,.28) 0%, rgba(11,14,20,.58) 34%, rgba(11,14,20,.74) 62%, rgba(11,14,20,.90) 84%, #0b0e14 100%)}
-  .portal{position:fixed; inset:0; z-index:99990; overflow:hidden; background:#05070f; animation:portalOut 1.25s cubic-bezier(.4,0,.2,1) forwards}
-  .portal::before{content:""; position:absolute; inset:0; background-image:url("/images/hero-entrance.jpg"); background-size:cover; background-position:center 20%; opacity:.62; animation:portalDim 1.25s ease forwards}
-  .portal::after{content:""; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 46%,transparent 28%,rgba(5,7,15,.62) 100%)}
-  .portal-word{position:absolute; top:43%; left:0; right:0; text-align:center; z-index:2; font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:5px; text-transform:uppercase; color:#cdd8ff; opacity:0; animation:wordIn 1.25s ease forwards}
-  .portal-sweep{position:absolute; top:0; bottom:0; width:38%; left:-38%; z-index:1; background:linear-gradient(90deg,transparent,rgba(150,175,255,.20),transparent); filter:blur(7px); animation:sweep 1.25s ease forwards}
-  .portal.gone{display:none}
-  @keyframes portalOut{0%,70%{opacity:1}100%{opacity:0; visibility:hidden}}
-  @keyframes portalDim{0%{opacity:.62}55%{opacity:.5}100%{opacity:.30}}
-  @keyframes wordIn{0%{opacity:0; transform:translateY(7px); letter-spacing:8px}18%{opacity:1; transform:translateY(0); letter-spacing:5px}58%{opacity:1}100%{opacity:0; transform:translateY(-11px)}}
-  @keyframes sweep{0%,28%{left:-38%}84%{left:100%}100%{left:100%}}
-  @media(prefers-reduced-motion:reduce){.portal{animation:none; opacity:0; visibility:hidden}}
+  .workspace-shell{max-width:1300px;margin:0 auto;padding:48px 40px 72px}
+  .workspace-topline{display:flex;justify-content:space-between;color:#8d9fcc;font:10px 'JetBrains Mono',monospace;letter-spacing:3px}
+  .workspace-topline small{color:#788bad;letter-spacing:0}
+  .workspace-hero{display:grid;grid-template-columns:1fr 1.05fr;min-height:490px;align-items:center;gap:30px}
+  .workspace-copy{position:relative;z-index:2;padding-top:20px}
+  .workspace-kicker{color:#91bfff;font:11px 'JetBrains Mono',monospace;letter-spacing:4px}
+  .workspace-copy h1{font:700 clamp(38px,4.6vw,64px)/1.28 -apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;letter-spacing:-2px;margin:22px 0;color:#ecf2ff}
+  .workspace-copy h1 em{font-style:normal;background:linear-gradient(90deg,#8fe3ff,#b19aff);color:transparent;background-clip:text;-webkit-background-clip:text}
+  .workspace-copy p{font:14px/2 -apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;color:#a9b8d5}
+  .workspace-signature{display:flex;align-items:center;gap:12px;margin-top:28px;color:#8ea4d0;font:10px 'JetBrains Mono',monospace}
+  .workspace-signature::before{content:'';width:35px;height:1px;background:#768fff}
+  .workspace-scene{height:490px;position:relative}
+  .workspace-orbit{width:390px;height:390px;border-radius:50%;border:1px solid #6275d666;position:absolute;top:20px;left:50%;transform:translateX(-50%);box-shadow:0 0 100px #4c52f61c,inset 0 0 80px #5173ff0d}
+  .workspace-orbit::before{content:'';position:absolute;inset:18px;border-radius:50%;border:1px dashed #6a8ded55}
+  .workspace-orbit::after{content:'⌖';color:#8ecfff;font-size:35px;position:absolute;top:34px;right:25px}
+  .workspace-mascot{filter:url(#solid-mascot) drop-shadow(0 24px 40px #0008);mask-image:radial-gradient(ellipse at 50% 52%,#000 50%,transparent 72%);position:absolute;width:310px;height:450px;object-fit:contain;left:50%;top:0;transform:translateX(-50%);animation:workspaceFloat 6s ease-in-out infinite}
+  .workspace-base{position:absolute;width:360px;height:80px;border-radius:50%;border:1px solid #8e9fff77;background:radial-gradient(ellipse,#596bed55,transparent 65%);bottom:20px;left:50%;transform:translateX(-50%);box-shadow:0 0 45px #5068ed22}
+  .workspace-base::after{content:'';position:absolute;inset:12px;border:1px solid #547ef555;border-radius:50%}
+  .workspace-float{position:absolute;background:#0b1225e8;border:1px solid #3f5788;border-radius:8px;padding:15px 18px;color:#9db5e2;box-shadow:0 16px 40px #0004;font:10px/1.9 'JetBrains Mono',monospace}
+  .workspace-float b{color:#91d8f8;font-size:9px;letter-spacing:2px;font-weight:400}
+  .workspace-code{left:0;top:85px;transform:rotate(-5deg)} .workspace-code span{color:#ba9bf6}
+  .workspace-reading{right:-5px;bottom:90px;transform:rotate(4deg)} .workspace-reading i{display:inline-block;width:5px;height:5px;background:#78d5bd;border-radius:50%;margin-right:7px}
+  .workspace-speech{position:absolute;right:0;top:14px;color:#c8d4f5;font-size:12px}
+  #cl-console{position:relative;z-index:3;margin-top:-12px!important}
+  @keyframes workspaceFloat{50%{transform:translate(-50%,-10px)}}
+  @media(max-width:750px){.workspace-shell{padding:32px 22px 60px}.workspace-topline{font-size:8px}.workspace-topline small{max-width:120px;text-align:right}.workspace-hero{grid-template-columns:1fr;gap:0}.workspace-copy h1{font-size:42px;margin:18px 0}.workspace-copy p{font-size:12px}.workspace-signature{margin-top:16px}.workspace-scene{height:330px}.workspace-orbit{width:270px;height:270px;top:24px}.workspace-mascot{width:220px;height:330px}.workspace-base{width:260px;height:55px;bottom:0}.workspace-float{padding:9px;font-size:8px}.workspace-code{left:-4px;top:80px}.workspace-reading{right:-7px;bottom:45px}.workspace-speech{font-size:10px;top:10px}#cl-console{margin-top:20px!important}}
+  @media(prefers-reduced-motion:reduce){.workspace-mascot{animation:none}}
 </style>
-<script>
-  // sky/portal を body直下へ（ヘッダーのz-indexを越えるため）。portalは~1.3sで消す。CSSだけでも消える。
-  (function(){
-    var sky=document.querySelector('.sky'), portal=document.getElementById('portal');
-    if(sky) document.body.appendChild(sky);
-    if(portal){
-      document.body.appendChild(portal);
-      var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-      if(reduce){portal.classList.add('gone');}
-      else{setTimeout(function(){portal.classList.add('gone');},1300);}
-    }
-  })();
-</script>
 
-<div style="max-width:860px;margin:0 auto;padding:22px 20px 60px">
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs><filter id="solid-mascot" color-interpolation-filters="sRGB"><feComponentTransfer><feFuncA type="linear" slope="8" intercept="0"/></feComponentTransfer></filter></defs></svg>
 
-  {{-- Hero ── app-entry_10 の Live Workspace 版（ロゴは上部バーにあるので割愛） --}}
-  <div style="text-align:center;margin-bottom:16px">
-    <p class="ai-system-label">REPOSITORY INTELLIGENCE</p>
-    <h1 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;font-size:clamp(26px,5vw,34px);font-weight:700;letter-spacing:-0.5px;line-height:1.15;margin:8px 0 0;background:linear-gradient(180deg,#ffffff,#c4d2ec);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 3px 22px rgba(88,166,255,0.18))">Live Workspace</h1>
-    <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;font-size:14.5px;color:var(--text-dim);margin:14px auto 0;max-width:420px;line-height:1.6">GitHub のリポジトリを、セキュリティ・品質・保守性の3軸で解析します。</p>
+<div class="workspace-shell">
+
+  <div class="workspace-topline"><span>CODELENS / READING DESK</span><small>READ · UNDERSTAND · REMEMBER · GROW</small></div>
+  <div class="workspace-hero">
+    <div class="workspace-copy">
+      <div class="workspace-kicker">REPOSITORY INTELLIGENCE</div>
+      <h1>そのコードには、<br><em>どんな物語がある？</em></h1>
+      <p>積み重ねた設計も、見落としたバグも。<br>CodeLensが読み解いて、ひとこと添えます。</p>
+      <div class="workspace-signature">READ → UNDERSTAND → REMEMBER → GROW</div>
+    </div>
+    <div class="workspace-scene" aria-label="CodeLensくんの解析デスク">
+      <div class="workspace-orbit"></div><div class="workspace-base"></div>
+      <img class="workspace-mascot" src="/images/cl-main.png" alt="虫眼鏡を持ったCodeLensくん">
+      <div class="workspace-float workspace-code"><b>REPOSITORY / SOURCE</b><br><span>class</span> YourRepository<br>&nbsp; def next_chapter<br>&nbsp;&nbsp; <span>read</span> · understand<br>&nbsp; end<br>end</div>
+      <div class="workspace-float workspace-reading"><b>THE READING LENS</b><br><i></i>QUALITY<br><i></i>SECURITY<br><i></i>MAINTAINABILITY</div>
+      <div class="workspace-speech">「さて、読ませてもらおう。」</div>
+    </div>
   </div>
 
   {{-- 🛸 in-place コンソール（console.html 移植・入力→解析→結果着地まで一枚のカードで・画面遷移なし）--}}
