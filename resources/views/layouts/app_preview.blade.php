@@ -46,28 +46,6 @@
     }
     a { color: inherit; text-decoration: none; }
 
-    /* Same-origin pages share one continuous room instead of flashing between documents. */
-    @view-transition { navigation: auto; }
-    .app-header { view-transition-name: codelens-header; }
-    .shared-stars { view-transition-name: codelens-stars; }
-    main { view-transition-name: codelens-page; }
-    ::view-transition-old(codelens-header),
-    ::view-transition-new(codelens-header),
-    ::view-transition-old(codelens-stars),
-    ::view-transition-new(codelens-stars) { animation: none; }
-    ::view-transition-old(codelens-page) { animation: codelens-page-out 130ms ease-in both; }
-    ::view-transition-new(codelens-page) { animation: codelens-page-in 220ms cubic-bezier(.2,.75,.25,1) both; }
-    @keyframes codelens-page-out {
-      to { opacity: 0; transform: translateY(-3px); }
-    }
-    @keyframes codelens-page-in {
-      from { opacity: 0; transform: translateY(5px); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      ::view-transition-old(codelens-page),
-      ::view-transition-new(codelens-page) { animation: none; }
-    }
-
     /* Header */
     .app-header {
       display: flex; align-items: center; justify-content: space-between;
