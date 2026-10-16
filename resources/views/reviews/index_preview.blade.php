@@ -19,10 +19,10 @@
   .workspace-orbit{width:390px;height:390px;border-radius:50%;border:1px solid #6275d666;position:absolute;top:20px;left:50%;transform:translateX(-50%);box-shadow:0 0 100px #4c52f61c,inset 0 0 80px #5173ff0d}
   .workspace-orbit::before{content:'';position:absolute;inset:18px;border-radius:50%;border:1px dashed #6a8ded55}
   .workspace-orbit::after{content:'⌖';color:#8ecfff;font-size:35px;position:absolute;top:34px;right:25px}
-  .workspace-mascot{filter:drop-shadow(0 24px 40px #0008);mask-image:radial-gradient(ellipse at 50% 52%,#000 55%,transparent 76%);position:absolute;width:310px;height:450px;object-fit:contain;left:50%;top:0;transform:translateX(-50%);animation:workspaceFloat 6s ease-in-out infinite}
-  .workspace-base{position:absolute;width:360px;height:80px;border-radius:50%;border:1px solid #8e9fff77;background:radial-gradient(ellipse,#596bed55,transparent 65%);bottom:20px;left:50%;transform:translateX(-50%);box-shadow:0 0 45px #5068ed22}
+  .workspace-mascot{position:absolute;z-index:1;width:310px;height:450px;object-fit:contain;left:50%;top:0;transform:translateX(-50%);animation:workspaceFloat 6s ease-in-out infinite}
+  .workspace-base{position:absolute;z-index:0;width:360px;height:80px;border-radius:50%;border:1px solid #8e9fff77;background:radial-gradient(ellipse,#596bed55,transparent 65%);bottom:20px;left:50%;transform:translateX(-50%);box-shadow:0 0 45px #5068ed22}
   .workspace-base::after{content:'';position:absolute;inset:12px;border:1px solid #547ef555;border-radius:50%}
-  .workspace-float{position:absolute;background:#0b1225e8;border:1px solid #3f5788;border-radius:8px;padding:15px 18px;color:#9db5e2;box-shadow:0 16px 40px #0004;font:10px/1.9 'JetBrains Mono',monospace}
+  .workspace-float{position:absolute;z-index:2;background:#0b1225e8;border:1px solid #3f5788;border-radius:8px;padding:15px 18px;color:#9db5e2;box-shadow:0 16px 40px #0004;font:10px/1.9 'JetBrains Mono',monospace}
   .workspace-float b{color:#91d8f8;font-size:9px;letter-spacing:2px;font-weight:400}
   .workspace-code{left:0;top:85px;transform:rotate(-5deg)} .workspace-code span{color:#ba9bf6}
   .workspace-reading{right:-5px;bottom:90px;transform:rotate(4deg)} .workspace-reading i{display:inline-block;width:5px;height:5px;background:#78d5bd;border-radius:50%;margin-right:7px}
