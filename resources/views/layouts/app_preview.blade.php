@@ -115,11 +115,12 @@
       filter: drop-shadow(0 0 7px rgba(0,150,255,0.5)) drop-shadow(0 0 2px rgba(120,80,255,0.3));
     }
     .nav { display: flex; gap: 20px; align-items: center; position: relative; top: 6px; }
-    .nav a { font-size: 0.73rem; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
+    .nav a { display: inline-flex; align-items: center; font-size: 0.73rem; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s; }
     .nav a:hover { color: var(--cyan); }
     /* 建物の案内板：今いるフロアに ● が点く */
+    .nav a::before { content: '●'; width: 13px; flex: 0 0 13px; color: transparent; font-size: 0.55em; vertical-align: 2px; }
     .nav a.nav-active { color: #e8edf5; }
-    .nav a.nav-active::before { content: '●'; color: var(--cyan); font-size: 0.55em; margin-right: 7px; vertical-align: 2px; }
+    .nav a.nav-active::before { color: var(--cyan); }
     /* 📘 Repository Intelligence（本館）への扉：本を開く行為。ラベルなし・ホバーで名前 */
     /* ② status pill から 16px 逃がして"一冊だけ置いてある"呼吸を作る */
     .repo-door { position: relative; display: flex; align-items: center; margin: 0 22px 0 4px; text-decoration: none;

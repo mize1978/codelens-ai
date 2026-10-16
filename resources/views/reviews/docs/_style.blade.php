@@ -15,22 +15,6 @@
     background-image:radial-gradient(circle,#86c9ff99 1px,transparent 2px); background-size:127px 109px;
     mask-image:linear-gradient(#000,transparent); }
 
-  /* ヒーローと同じヘッダー。既存の導線とリンクは変えない。 */
-  .app-header{ height:80px; padding:0 5vw; background:#080b1c!important;
-    border-bottom:1px solid #263457!important; backdrop-filter:none!important; }
-  .logo{ animation:none!important; }
-  .logo-name{ font-size:1.42rem!important; }
-  .nav{ gap:28px!important; top:auto!important; }
-  .nav a{ font-size:.69rem!important; letter-spacing:.18em!important; }
-  .repo-door{ width:auto!important; height:52px!important; border:none!important; border-radius:0!important;
-    background:none!important; box-shadow:none!important; gap:9px!important; padding:0!important; }
-  .repo-door img{ width:auto!important; height:46px!important; }
-  .repo-door-tip{ position:static!important; display:inline!important; opacity:1!important; transform:none!important;
-    white-space:nowrap; font:11px/1 system-ui,sans-serif!important; color:#ecf2ff!important; background:none!important;
-    border:none!important; padding:0!important; pointer-events:auto!important; }
-  .repo-door-tip::after{ content:' ↗'; }
-  .status-pill{ font-size:.64rem!important; }
-
   .doc-wrap{ max-width:820px; margin:0 auto; padding:52px 24px 96px;
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif; }
 
@@ -107,10 +91,6 @@
     font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.5px; color:rgba(204,232,255,.32); line-height:1.9; }
 
   @media(max-width:900px){
-    .app-header{ height:70px; padding:0 20px; }
-    .nav,.status-pill{ display:none!important; }
-    .repo-door{ margin-left:auto!important; }
-    .repo-door-tip{ font-size:10px!important; }
     .doc-wrap{ padding:36px 20px 72px; }
     .doc-item{ align-items:flex-start; flex-direction:column; gap:6px; }
   }
