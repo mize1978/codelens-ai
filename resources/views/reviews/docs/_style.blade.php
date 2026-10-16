@@ -106,7 +106,7 @@
   .ref-last{ margin-top:52px; padding-top:22px; border-top:1px solid rgba(0,200,255,.09);
     font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.5px; color:rgba(204,232,255,.32); line-height:1.9; }
 
-  @media(max-width:750px){
+  @media(max-width:900px){
     .app-header{ height:70px; padding:0 20px; }
     .nav,.status-pill{ display:none!important; }
     .repo-door{ margin-left:auto!important; }
