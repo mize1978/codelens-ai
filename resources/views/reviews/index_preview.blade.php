@@ -43,7 +43,7 @@
     </div>
     <div class="workspace-scene" aria-label="CodeLensくんの解析デスク">
       <div class="workspace-orbit"></div><div class="workspace-base"></div>
-      <img class="workspace-mascot" src="/images/codelens-idle.png" alt="本を読むCodeLensくん">
+      <img class="workspace-mascot" src="/images/cl-main.png" alt="虫眼鏡を持ったCodeLensくん">
       <div class="workspace-float workspace-code"><b>REPOSITORY / SOURCE</b><br><span>class</span> YourRepository<br>&nbsp; def next_chapter<br>&nbsp;&nbsp; <span>read</span> · understand<br>&nbsp; end<br>end</div>
       <div class="workspace-float workspace-reading"><b>THE READING LENS</b><br><i></i>QUALITY<br><i></i>SECURITY<br><i></i>MAINTAINABILITY</div>
       <div class="workspace-speech">「さて、読ませてもらおう。」</div>
