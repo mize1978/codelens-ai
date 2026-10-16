@@ -19,7 +19,7 @@
   .workspace-orbit{width:390px;height:390px;border-radius:50%;border:1px solid #6275d666;position:absolute;top:20px;left:50%;transform:translateX(-50%);box-shadow:0 0 100px #4c52f61c,inset 0 0 80px #5173ff0d}
   .workspace-orbit::before{content:'';position:absolute;inset:18px;border-radius:50%;border:1px dashed #6a8ded55}
   .workspace-orbit::after{content:'⌖';color:#8ecfff;font-size:35px;position:absolute;top:34px;right:25px}
-  .workspace-mascot{filter:url(#solid-mascot) drop-shadow(0 24px 40px #0008);mask-image:radial-gradient(ellipse at 50% 52%,#000 50%,transparent 72%);position:absolute;width:310px;height:450px;object-fit:contain;left:50%;top:0;transform:translateX(-50%);animation:workspaceFloat 6s ease-in-out infinite}
+  .workspace-mascot{filter:drop-shadow(0 24px 40px #0008);mask-image:radial-gradient(ellipse at 50% 52%,#000 55%,transparent 76%);position:absolute;width:310px;height:450px;object-fit:contain;left:50%;top:0;transform:translateX(-50%);animation:workspaceFloat 6s ease-in-out infinite}
   .workspace-base{position:absolute;width:360px;height:80px;border-radius:50%;border:1px solid #8e9fff77;background:radial-gradient(ellipse,#596bed55,transparent 65%);bottom:20px;left:50%;transform:translateX(-50%);box-shadow:0 0 45px #5068ed22}
   .workspace-base::after{content:'';position:absolute;inset:12px;border:1px solid #547ef555;border-radius:50%}
   .workspace-float{position:absolute;background:#0b1225e8;border:1px solid #3f5788;border-radius:8px;padding:15px 18px;color:#9db5e2;box-shadow:0 16px 40px #0004;font:10px/1.9 'JetBrains Mono',monospace}
@@ -32,8 +32,6 @@
   @media(max-width:750px){.workspace-shell{padding:32px 22px 60px}.workspace-topline{font-size:8px}.workspace-topline small{max-width:120px;text-align:right}.workspace-hero{grid-template-columns:1fr;gap:0}.workspace-copy h1{font-size:42px;margin:18px 0}.workspace-copy p{font-size:12px}.workspace-signature{margin-top:16px}.workspace-scene{height:330px}.workspace-orbit{width:270px;height:270px;top:24px}.workspace-mascot{width:220px;height:330px}.workspace-base{width:260px;height:55px;bottom:0}.workspace-float{padding:9px;font-size:8px}.workspace-code{left:-4px;top:80px}.workspace-reading{right:-7px;bottom:45px}.workspace-speech{font-size:10px;top:10px}#cl-console{margin-top:20px!important}}
   @media(prefers-reduced-motion:reduce){.workspace-mascot{animation:none}}
 </style>
-
-<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs><filter id="solid-mascot" color-interpolation-filters="sRGB"><feComponentTransfer><feFuncA type="linear" slope="8" intercept="0"/></feComponentTransfer></filter></defs></svg>
 
 <div class="workspace-shell">
 
