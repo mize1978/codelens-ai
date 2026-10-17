@@ -463,21 +463,75 @@
     @yield('content')
   </main>
 <script>
-// Internal navigation is prefetched on intent so the next room is ready before the click.
+// Keep the shared header on screen and swap only the page body for primary navigation.
 (function () {
-  const prefetched = new Set();
-  function prefetch(link) {
-    if (!link || !link.href || link.target === '_blank' || link.hasAttribute('download')) return;
-    const url = new URL(link.href, location.href);
-    if (url.origin !== location.origin || url.pathname === location.pathname || prefetched.has(url.href)) return;
-    prefetched.add(url.href);
-    const hint = document.createElement('link');
-    hint.rel = 'prefetch';
-    hint.href = url.href;
-    document.head.appendChild(hint);
+  const cache = new Map();
+
+  function load(url) {
+    if (!cache.has(url.href)) {
+      cache.set(url.href, fetch(url.href, { headers: { 'X-CodeLens-Shell': '1' } })
+        .then(function (response) {
+          if (!response.ok) throw new Error('Navigation failed');
+          return response.text();
+        })
+        .catch(function (error) { cache.delete(url.href); throw error; }));
+    }
+    return cache.get(url.href);
   }
-  document.addEventListener('pointerover', function (event) { prefetch(event.target.closest('a')); }, { passive: true });
-  document.addEventListener('touchstart', function (event) { prefetch(event.target.closest('a')); }, { passive: true });
+
+  function runScripts(root) {
+    root.querySelectorAll('script').forEach(function (oldScript) {
+      const script = document.createElement('script');
+      Array.from(oldScript.attributes).forEach(function (attr) { script.setAttribute(attr.name, attr.value); });
+      script.textContent = oldScript.textContent;
+      oldScript.replaceWith(script);
+    });
+  }
+
+  function applyPage(html, url, push) {
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+    const nextMain = parsed.querySelector('main');
+    const currentMain = document.querySelector('main');
+    if (!nextMain || !currentMain) { location.href = url.href; return; }
+
+    currentMain.replaceWith(document.importNode(nextMain, true));
+    document.title = parsed.title;
+    document.body.className = parsed.body.className;
+    document.querySelectorAll('.nav a').forEach(function (link) {
+      const nextLink = parsed.querySelector('.nav a[href="' + link.getAttribute('href') + '"]');
+      link.className = nextLink ? nextLink.className : '';
+    });
+    runScripts(document.querySelector('main'));
+    if (push) history.pushState({ codelensShell: true }, '', url.href);
+    window.scrollTo(0, 0);
+  }
+
+  function navigate(url, push) {
+    load(url).then(function (html) { applyPage(html, url, push); })
+      .catch(function () { location.href = url.href; });
+  }
+
+  function targetLink(event) {
+    const link = event.target.closest('.nav a');
+    if (!link || link.target === '_blank' || link.hasAttribute('download')) return null;
+    const url = new URL(link.href, location.href);
+    return url.origin === location.origin ? { link: link, url: url } : null;
+  }
+
+  history.replaceState({ codelensShell: true }, '', location.href);
+  document.addEventListener('pointerover', function (event) {
+    const target = targetLink(event); if (target) load(target.url).catch(function () {});
+  }, { passive: true });
+  document.addEventListener('touchstart', function (event) {
+    const target = targetLink(event); if (target) load(target.url).catch(function () {});
+  }, { passive: true });
+  document.addEventListener('click', function (event) {
+    const target = targetLink(event);
+    if (!target || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    if (target.url.href !== location.href) navigate(target.url, true);
+  });
+  window.addEventListener('popstate', function () { location.reload(); });
 })();
 
 // CodeLens Status Controller
