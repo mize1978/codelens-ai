@@ -97,26 +97,23 @@
       <div class="proof" id="proof">
         <div class="complete">✓ Review Complete</div>
         <div class="result-hero" id="hero">
-          <div class="hero-ring">
-            <svg viewBox="0 0 220 220" width="220" height="220">
-              <circle cx="110" cy="110" r="96" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"></circle>
-              <circle id="ringfill" cx="110" cy="110" r="96" fill="none" stroke="#3fb950" stroke-width="8" stroke-linecap="round" stroke-dasharray="603" stroke-dashoffset="603" transform="rotate(-90 110 110)"></circle>
-            </svg>
-            <div class="hero-center">
-              <div class="hero-score" id="score">0</div>
-              <div class="hero-grade" id="grade">GOOD</div>
+          <div class="hero-score-panel">
+            <div class="hero-score" id="score">0</div>
+            <div class="hero-stars" id="heroStars"></div>
+          </div>
+          <div class="hero-copy">
+            <div class="hero-grade" id="grade">GOOD</div>
+            <div class="hero-sublabel" id="gradeSublabel">改善余地があります</div>
+            <div class="hero-repo" id="repoName">rewardme</div>
+            <div class="result-rest" id="rest">
+              {{-- Repository Insight（本物のAI総評・辛辣な名刺）── Score → Memory の橋渡し --}}
+              <div class="insight" id="insightBox">
+                <div class="insight-label">CodeLens says</div>
+                <p class="insight-text" id="insightText">—</p>
+              </div>
+              {{-- Memory Card と exit は「本編の最後（締め）」へ移動（レポートの下）--}}
             </div>
           </div>
-          <div class="hero-repo" id="repoName">rewardme</div>
-          <div class="hero-stars" id="heroStars"></div>
-        </div>
-        <div class="result-rest" id="rest">
-          {{-- Repository Insight（本物のAI総評・辛辣な名刺）── Score → Memory の橋渡し --}}
-          <div class="insight" id="insightBox">
-            <div class="insight-label">Repository Insight</div>
-            <p class="insight-text" id="insightText">—</p>
-          </div>
-          {{-- Memory Card と exit は「本編の最後（締め）」へ移動（レポートの下）--}}
         </div>
       </div>
     </div>
@@ -152,21 +149,37 @@
     .step .grow{ flex:1 } .step .verb{ color:inherit }
     .proof{ margin-top:8px; border-top:1px solid var(--line); padding:22px 26px 26px; display:none } .proof.show{ display:block; animation:rise .6s ease }
     .complete{ font-family:var(--mono); font-size:12px; letter-spacing:.5px; color:var(--good); text-transform:uppercase; margin-bottom:6px }
-    .result-hero{ position:relative; text-align:center; padding:10px 0 6px }
-    .result-hero::before{ content:""; position:absolute; top:6px; left:50%; width:280px; height:280px; transform:translateX(-50%) scale(.6); border-radius:50%; pointer-events:none; opacity:0; background:radial-gradient(circle, var(--glow,rgba(63,185,80,.20)), transparent 62%) }
-    .hero-ring{ position:relative; width:220px; height:220px; margin:0 auto } .hero-ring svg{ display:block }
-    .hero-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center }
-    .hero-score{ font-family:var(--sans); font-weight:800; font-size:78px; line-height:1; letter-spacing:-2.5px; color:var(--good) }
-    .hero-grade{ font-family:var(--mono); font-size:17px; letter-spacing:3.5px; text-transform:uppercase; margin-top:8px; color:var(--good) }
-    .hero-repo{ font-family:var(--mono); font-size:14px; color:var(--sub); margin-top:16px }
-    .result-hero.land::before{ animation:glowBurst 1.1s ease both } .result-hero.land .hero-center{ animation:landIn .62s cubic-bezier(.2,.85,.25,1.15) both } .result-hero.land .hero-grade{ animation:gradeIgnite .55s .32s ease both }
-    @keyframes glowBurst{ 0%{opacity:0; transform:translateX(-50%) scale(.6)} 42%{opacity:1; transform:translateX(-50%) scale(1.02)} 100%{opacity:.5; transform:translateX(-50%) scale(1)} }
-    @keyframes landIn{ 0%{transform:scale(1.4); opacity:0} 55%{opacity:1} 100%{transform:scale(1)} }
+    .result-hero{ --score-color:var(--good); position:relative; display:grid; grid-template-columns:180px minmax(0,1fr); gap:28px; align-items:center; min-height:238px; margin-top:12px; padding:28px 32px; text-align:left; overflow:hidden; border:1px solid color-mix(in srgb,var(--score-color) 80%,transparent); border-radius:16px; background:linear-gradient(135deg,rgba(5,8,20,.94),rgba(12,13,32,.86)); box-shadow:0 0 0 1px color-mix(in srgb,var(--score-color) 12%,transparent),0 18px 46px rgba(0,0,0,.3),inset 0 0 52px color-mix(in srgb,var(--score-color) 5%,transparent) }
+    .result-hero::before{ content:""; position:absolute; inset:-45% auto auto -8%; width:330px; height:330px; border-radius:50%; pointer-events:none; opacity:.3; background:radial-gradient(circle,var(--glow,rgba(63,185,80,.20)),transparent 66%) }
+    .hero-score-panel{ position:relative; z-index:1; display:flex; min-width:0; flex-direction:column; align-items:center; justify-content:center; padding-right:28px; border-right:1px solid rgba(255,255,255,.09) }
+    .hero-score{ font-family:var(--sans); font-weight:800; font-size:92px; line-height:.92; letter-spacing:-4px; color:var(--good); text-shadow:0 0 30px color-mix(in srgb,var(--score-color) 45%,transparent) }
+    .hero-stars{ min-height:19px; margin-top:15px; font-family:var(--mono); font-size:15px; letter-spacing:3px }
+    .hero-copy{ position:relative; z-index:1; min-width:0 }
+    .hero-grade{ font-family:var(--mono); font-size:20px; font-weight:800; letter-spacing:4px; line-height:1; text-transform:uppercase; color:var(--good) }
+    .hero-sublabel{ margin-top:7px; font-size:13px; color:var(--mut) }
+    .hero-repo{ margin-top:12px; font-family:var(--mono); font-size:14px; color:var(--sub) }
+    .result-hero.land{ animation:cardLand .62s cubic-bezier(.2,.85,.25,1.08) both } .result-hero.land::before{ animation:glowBurst 1.1s ease both } .result-hero.land .hero-score{ animation:scoreLand .62s cubic-bezier(.2,.85,.25,1.15) both } .result-hero.land .hero-grade{ animation:gradeIgnite .55s .32s ease both }
+    @keyframes cardLand{ from{opacity:0; transform:translateY(12px) scale(.985)} to{opacity:1; transform:none} }
+    @keyframes glowBurst{ 0%{opacity:0; transform:scale(.6)} 42%{opacity:.72; transform:scale(1.04)} 100%{opacity:.3; transform:scale(1)} }
+    @keyframes scoreLand{ 0%{transform:scale(1.28); opacity:0} 55%{opacity:1} 100%{transform:scale(1)} }
     @keyframes gradeIgnite{ from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none} }
     .result-rest{ opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .6s ease } .result-rest.show{ opacity:1; transform:none }
-    .insight{ margin-top:22px; padding-top:20px; border-top:1px solid var(--line) }
-    .insight-label{ font-family:var(--mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--info); margin-bottom:11px }
-    .insight-text{ font-size:16px; line-height:1.85; color:#c9d3e4; margin:0; font-family:var(--sans) }
+    .insight{ margin-top:20px; padding-top:18px; border-top:1px solid rgba(255,255,255,.1) }
+    .insight-label{ font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--score-color); margin-bottom:9px }
+    .insight-text{ max-width:720px; margin:0; font-family:var(--sans); font-size:18px; font-weight:650; font-style:italic; line-height:1.68; color:#eef3ff; text-shadow:0 0 18px color-mix(in srgb,var(--score-color) 28%,transparent) }
+    @media (max-width:700px){
+      .result-hero{ grid-template-columns:108px minmax(0,1fr); gap:20px; min-height:0; padding:24px 20px }
+      .hero-score-panel{ padding-right:18px }
+      .hero-score{ font-size:64px; letter-spacing:-3px }
+      .hero-stars{ font-size:10px; letter-spacing:1px }
+      .hero-grade{ font-size:16px; letter-spacing:2.5px }
+      .insight-text{ font-size:15px; line-height:1.65 }
+    }
+    @media (max-width:460px){
+      .result-hero{ grid-template-columns:1fr; gap:18px }
+      .hero-score-panel{ align-items:flex-start; padding:0 0 18px; border-right:0; border-bottom:1px solid rgba(255,255,255,.09) }
+      .hero-stars{ margin-top:10px }
+    }
     .memory-stamp{ position:relative; display:flex; align-items:flex-start; gap:13px; margin-top:20px; padding:16px 18px; border-radius:12px; background:linear-gradient(135deg,rgba(124,108,255,.12),rgba(47,139,255,.05)); border:1px solid var(--line2) }
     .grow-tag{ position:absolute; top:13px; right:15px; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--good); text-shadow:0 0 12px rgba(63,185,80,.5); opacity:0; transform:translateY(-3px); transition:opacity .5s ease .35s, transform .5s ease .35s }
     .result-rest.show .grow-tag{ opacity:1; transform:none }
@@ -767,9 +780,9 @@
   var proof = document.getElementById('proof');
   var steps = [].slice.call(document.querySelectorAll('#steps .step'));
   var chaser = [].slice.call(document.querySelectorAll('#chaser .v'));
-  var ringfill = document.getElementById('ringfill');
   var scoreEl = document.getElementById('score');
   var gradeEl = document.getElementById('grade');
+  var gradeSublabelEl = document.getElementById('gradeSublabel');
   var repoNameEl = document.getElementById('repoName');
   var repo = document.getElementById('repo');
   var go = document.getElementById('go');
@@ -814,7 +827,6 @@
     steps.forEach(function(s){s.classList.remove('active','done');});
     chaser.forEach(function(w){w.classList.remove('on');});
     document.body.classList.remove('ws-analyzing','ws-processing');
-    ringfill.style.transition='none'; ringfill.setAttribute('stroke-dashoffset','603');
     scoreEl.textContent='0'; go.disabled=false; go.textContent='Analyze';
   }
 
@@ -859,15 +871,14 @@
 
   function finish(d){
     repoNameEl.textContent = d.repo || (repo.value.split('/').filter(Boolean).pop()||'repository');
-    gradeEl.textContent=d.grade; gradeEl.style.color=d.color; scoreEl.style.color=d.color; ringfill.setAttribute('stroke',d.color);
+    gradeEl.textContent=d.grade; gradeEl.style.color=d.color; scoreEl.style.color=d.color;
+    if(gradeSublabelEl){ gradeSublabelEl.textContent=d.score>=80?'最高レベルのコード品質':d.score>=60?'改善余地があります':d.score>=40?'いくつかの問題があります':'大幅な改善が必要です'; }
     var hs=document.getElementById('heroStars');
     if(hs){ var n=Math.max(0,Math.min(5,Math.round(d.score/20))); hs.style.color=d.color; hs.textContent=Array(n+1).join('★')+Array(6-n).join('☆'); }
-    hero.style.setProperty('--glow',hexA(d.color,.22)); gradeEl.style.textShadow='0 0 20px '+hexA(d.color,.55);
+    hero.style.setProperty('--glow',hexA(d.color,.22)); hero.style.setProperty('--score-color',d.color); gradeEl.style.textShadow='0 0 20px '+hexA(d.color,.55);
     proof.classList.add('show'); hero.classList.remove('land'); void hero.offsetWidth; hero.classList.add('land');
-    var off=603*(1-d.score/100);
-    if(reduce){ ringfill.setAttribute('stroke-dashoffset',off); scoreEl.textContent=d.score; chaser[3].classList.add('on'); rest.classList.add('show'); }
+    if(reduce){ scoreEl.textContent=d.score; chaser[3].classList.add('on'); rest.classList.add('show'); }
     else{
-      requestAnimationFrame(function(){ ringfill.style.transition='stroke-dashoffset 1.2s cubic-bezier(.3,0,.2,1)'; ringfill.setAttribute('stroke-dashoffset',off); });
       countTo(scoreEl,d.score,1200);
       setTimeout(function(){chaser[3].classList.add('on');},1200);
       setTimeout(function(){rest.classList.add('show');},1050);
